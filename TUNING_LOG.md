@@ -8,6 +8,12 @@
 
 ## The Batch (2026-07-15, all four items shipped)
 
+- 2026-07-15 · G/A · SHANTY PROGRESSION + NO STRINGS: Simone A/B-tested pluck
+  off and it won — part removed, accordion is the harmonic bed (intro passage
+  now admits squeeze). Progression made intentional: aeolian, verse i-i-bVII-i,
+  chorus bVI→bVII→i anthem walk · "progression doing too much, strings too
+  delicate"
+
 - 2026-07-15 · T/G · SHANTY GRIT PASS: lute→OUD, davul-weight drum on pulse 2,
   crew claps both pulses at rowdy, accordion stabbier (attack .22→.12, gain up,
   notes .45→.55), drone .3→.38, rough 1.5 · "still not piratey — too delicate"

@@ -148,13 +148,14 @@ export const STYLES = {
     /* pirate rework per research: rolling swung 6/8, halyard one-pull-per-bar
        with the gang's clap answer, accordion bellows bed, fiddle croon,
        hemiola fills, extra human roughness */
-    /* jaunty per Simone: Drunken Sailor bones — Dorian (the raised 6th is
-       the sea-legs), i-bVII vamp, brisk roll */
-    name: 'Saltbeard’s Shanty', icon: '⚓', mode: 'dorian', tonic: 4, bpm: 104,
+    /* jaunty but INTENTIONAL: verse sits on home with one bVII lift, chorus
+       climbs the anthem walk bVI -> bVII -> i. No strings — the accordion is
+       the harmonic bed (Simone A/B-tested the pluck off; it won). */
+    name: 'Saltbeard’s Shanty', icon: '⚓', mode: 'aeolian', tonic: 4, bpm: 104,
     beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .06, rough: 1.5,
     reverb: .16, drone: .38, pad: .05,
-    sections: {A: [{d:0,q:'m'},{d:0,q:'m'},{d:6,q:'M'},{d:6,q:'M'}],
-               B: [{d:0,q:'m'},{d:6,q:'M'},{d:0,q:'m'},{d:0,q:'m'}]},
+    sections: {A: [{d:0,q:'m'},{d:0,q:'m'},{d:6,q:'M'},{d:0,q:'m'}],
+               B: [{d:5,q:'M'},{d:6,q:'M'},{d:0,q:'m'},{d:0,q:'m'}]},
     form: 'AABB',
     parts: {
       drums: {kind:'drum', map:'shanty',
@@ -169,11 +170,6 @@ export const STYLES = {
       tss: {kind:'gen', inst:'silver', gen:'backbeatTss'},
       squeeze: {kind:'gen', inst:'accordion', gen:'squeeze'},
       bowed: {kind:'gen', inst:'fiddle', gen:'bowedLine', octave:12},
-      pluck: {kind:'harmony', inst:'oud',
-        pat: {calm: [{s:'C...........',w:1}],
-              lively: [{s:'C.....c.....',w:2},{s:'C..u..c..u..',w:1},{s:'C.1.2.c.....',w:1}],
-              rowdy: [{s:'C.c.u.C.c.u.',w:2},{s:'C.1.2.c..u..',w:1}]},
-        fills: ['C.....4.3.2.']},
       bass: {kind:'bass', inst:'bassViol',
         pat: {calm: [{s:'R...........',w:1}],
               lively: [{s:'R.....5.....',w:2},{s:'R.........P.',w:1}],

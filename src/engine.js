@@ -563,7 +563,7 @@ export function setHearth(onNow) {
    it starts the next pass — endless play, song-shaped. Role lists gate
    which parts sound, on top of the user's toggles. */
 const ARC = [
-  {id: 'intro', sec: 'A', mBars: 4, label: 'intro',  roles: ['pluck', 'drone', 'pad']},
+  {id: 'intro', sec: 'A', mBars: 4, label: 'intro',  roles: ['pluck', 'drone', 'pad', 'squeeze']},
   {id: 'A1',    sec: 'A', mBars: 8, label: 'verse',  roles: ['pluck', 'drone', 'pad', 'bass', 'drums']},
   {id: 'A2',    sec: 'A', mBars: 8, label: 'rise',   roles: ['pluck', 'drone', 'pad', 'bass', 'drums', 'texture', 'bowed']},
   {id: 'B1',    sec: 'B', mBars: 8, label: 'turn',   roles: ['pluck', 'drone', 'pad', 'bass', 'drums', 'texture', 'bowed', 'tss', 'jingle', 'squeeze']},
