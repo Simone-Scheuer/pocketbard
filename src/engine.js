@@ -9,7 +9,7 @@
    5. Sequencer             lookahead scheduler: parts -> events -> instruments
    ============================================================ */
 import {clamp, lerp, rand, choice, mtof} from './util.js';
-import {makeChord, passingNote} from './theory.js';
+import {makeChord, passingNote, MODES} from './theory.js';
 import {STYLES, DRUM_MAPS, validateStyles} from './styles.js';
 import {state, persist} from './state.js';
 import {SampleLibrary} from './samples.js';
@@ -148,6 +148,7 @@ function renderKS(freq, p, sr) {
 /* ================= instruments ================= */
 export const INSTRUMENTS = {};
 export const HAND_DRUMS = ['bodhran', 'darbuka', 'bongos'];
+export const HARMONY_INSTS = ['lute', 'harp', 'oud'];
 
 class Instrument {
   constructor(def) { this.def = def; this.id = def.id; this.out = null; INSTRUMENTS[def.id] = this; }
@@ -419,6 +420,28 @@ export function applyMix() {
 }
 
 /* ================= generators ================= */
+/* melodic memory across bars (a plucked line, a bowed countermelody) */
+const melState = {};
+export function resetMel() { for (const k in melState) delete melState[k]; }
+
+/* scale-degree -> MIDI in a given mode, base octave anchored on the tonic */
+function degToMidi(deg, tonicPc, modeKey, baseMidi) {
+  const iv = MODES[modeKey].iv, N = iv.length;
+  const oct = Math.floor(deg / N), idx = ((deg % N) + N) % N;
+  return baseMidi + tonicPc + oct * 12 + iv[idx];
+}
+/* chord tones as scale degrees (triad built on the chord's scale degree) */
+function chordDegrees(chordDeg) { return [chordDeg, chordDeg + 2, chordDeg + 4]; }
+function nearestChordTone(deg, chordDeg, N) {
+  const tones = chordDegrees(chordDeg);
+  let best = deg, bd = 99;
+  for (const cd of tones) for (let o = -2; o <= 2; o++) {
+    const cand = cd + o * N, d = Math.abs(cand - deg);
+    if (d < bd) { bd = d; best = cand; }
+  }
+  return best;
+}
+
 export const GENERATORS = {
   /* "hands on bongos": quiet finger taps between the timekeeper's accents —
      one phrase per section, repeated like a real player grooving on a lick */
@@ -450,6 +473,77 @@ export const GENERATORS = {
     ev.push({step: 0, chordOff: off, durSteps: ctx.stepsPerBar, vel: .32});
     if (ctx.passage === 'break')
       ev.push({step: 0, off: .3, chordOff: off === 7 ? 0 : 7, durSteps: ctx.stepsPerBar, vel: .24});
+    return ev;
+  }},
+  /* the medieval string melody: a flowing modal line — stepwise motion with
+     a phrase arc, chord tones on strong beats, the modal color notes leaned
+     on, and celtic grace-note ornaments. This is what makes it sound "old"
+     rather than like block backing. */
+  melody: {mode: 'bar', fn(ctx, part) {
+    const id = 'mel:' + (part.inst || 'x');
+    const s = melState[id] ??= {deg: 0, phraseBar: 0};
+    const N = MODES[ctx.mode].iv.length;
+    const base = part.base ?? 60;               /* tonic register (C4-ish) */
+    const midi = d => degToMidi(d, ctx.tonic, ctx.mode, base);
+    const cdeg = ctx.chordDeg;
+    /* modal colour notes to lean on: b7 (deg 6) always, +natural-6 (deg 5) in Dorian/Mixolydian */
+    const colour = (ctx.mode === 'dorian' || ctx.mode === 'mixolydian') ? [5, 6] : [6];
+    const R6 = [[0,2,4,6,8,10],[0,3,4,6,9,10],[0,2,3,5,6,8,9,11],[0,2,4,5,6,8,10,11],[0,3,6,8,9,11]];
+    const R4 = [[0,2,4,6,8,10,12,14],[0,3,4,6,8,11,12,14],[0,2,4,6,8,10,12,13,14],[0,4,6,8,10,12,14],[0,2,3,4,8,10,11,12]];
+    const rhythm = choice(ctx.stepsPerBeat === 6 ? R6 : R4);
+    const rising = s.phraseBar < 2;
+    const lastIdx = rhythm.length - 1;
+    const ev = [];
+    for (let k = 0; k < rhythm.length; k++) {
+      const step = rhythm[k];
+      const strong = step % ctx.stepsPerBeat === 0;
+      const resolving = s.phraseBar === 3 && k >= rhythm.length - 2;
+      if (resolving) {
+        /* land the phrase: walk toward the tonic/nearest chord tone */
+        if (k === lastIdx) s.deg = nearestChordTone(0, cdeg, N);
+        else s.deg += Math.sign(0 - s.deg) || 0;
+      } else if (strong) {
+        s.deg = nearestChordTone(s.deg, cdeg, N);
+      } else {
+        const r = Math.random();
+        let stepMove = r < .58 ? (rising ? 1 : -1)
+          : r < .8 ? (rising ? -1 : 1)
+          : r < .9 ? (rising ? 2 : -2)
+          : 0;
+        s.deg += stepMove;
+        /* lean toward a colour note now and then for the modal flavour */
+        if (Math.random() < .22) {
+          const target = choice(colour);
+          const here = ((s.deg % N) + N) % N;
+          if (here !== target) s.deg += Math.sign(target - here);
+        }
+      }
+      /* keep it under the whistle: reflect within roughly D4..D5 */
+      if (s.deg > 7) s.deg = 7 - (s.deg - 7);
+      if (s.deg < -3) s.deg = -3 + (-3 - s.deg);
+      s.deg = clamp(s.deg, -4, 8);
+      const vel = (strong ? .72 : .5) * (.85 + Math.random() * .3);
+      /* grace-note ornament: a quick step above, just before a strong note */
+      if (strong && !resolving && Math.random() < .16)
+        ev.push({step, off: -.4, midi: midi(s.deg + 1), vel: vel * .5});
+      ev.push({step, midi: midi(s.deg), vel});
+    }
+    s.phraseBar = (s.phraseBar + 1) % 4;
+    return ev;
+  }},
+  /* the fiddle as a SECOND voice, not a drone: one slow sustained chord tone
+     per bar, stepping to the next — a countermelody weaving under the lead */
+  fiddleLine: {mode: 'bar', fn(ctx) {
+    const s = melState['fid'] ??= {deg: 4};
+    const N = MODES[ctx.mode].iv.length;
+    const base = 48; /* base must be a multiple of 12 so deg 0 == the tonic */
+    const midi = d => degToMidi(clamp(d, 3, 9), ctx.tonic, ctx.mode, base);
+    const drift = Math.random() < .55 ? (Math.random() < .5 ? 1 : -1) : 0;
+    s.deg = clamp(nearestChordTone(s.deg + drift, ctx.chordDeg, N), 3, 9);
+    const ev = [{step: 0, midi: midi(s.deg), durSteps: ctx.stepsPerBar, vel: .3}];
+    if (Math.random() < .4) /* move to another chord tone mid-bar for motion */
+      ev.push({step: Math.floor(ctx.stepsPerBar / 2), midi: midi(nearestChordTone(s.deg + 2, ctx.chordDeg, N)),
+        durSteps: Math.ceil(ctx.stepsPerBar / 2), vel: .26});
     return ev;
   }},
   /* the bellows: one wheezy chord swell per bar (root, fifth, octave) */
@@ -594,6 +688,7 @@ function partOn(pname, part) {
   const t = state.toggles;
   if (pname === 'bowed') return t.fiddle;
   if (pname === 'squeeze') return t.pad;
+  if (pname === 'pluck') return t.pluck; /* melodic pluck gens ride the Strings toggle */
   if (part.kind === 'drum' || pname === 'texture') return t.drums;
   if (part.kind === 'jingle' || pname === 'tss') return t.jingle;
   if (part.kind === 'harmony') return t.pluck;
@@ -610,6 +705,7 @@ function beginBar(when) {
     }
     if (st.pending.tonic !== undefined) st.tonic = st.pending.tonic;
     st.pending = {}; st.lastDrone = null; st.arc = null; /* new tune, fresh arc */
+    resetMel();
   }
   const sty = STYLES[st.styleId];
   const stepsPerBar = sty.beatsPerBar * sty.stepsPerBeat;
@@ -683,7 +779,8 @@ function beginBar(when) {
       if (isFill && part.fills && Math.random() < Math.min(.95, fp)) s = choice(part.fills);
       pats[pname] = s;
     }
-    const ctx = Object.assign({}, st._secCtx, {bar: st.barIdx, isFill, passage: pass.id});
+    const ctx = Object.assign({}, st._secCtx, {bar: st.barIdx, isFill, passage: pass.id,
+      chordDeg: spec.d, tonic: st.tonic, mode: sty.mode});
     for (const [pname, part] of Object.entries(sty.parts)) {
       if (part.kind !== 'gen' || !partOn(pname, part) || !roleActive(pass, pname)) continue;
       const g = GENERATORS[part.gen];
@@ -779,15 +876,18 @@ function scheduleStep(when) {
     const evs = byStep[st.stepInBar];
     if (!evs) continue;
     const part = sty.parts[pname];
-    const inst = INSTRUMENTS[part.inst];
+    let instId = part.inst;
+    if (HARMONY_INSTS.includes(instId) && state.voices.strings) instId = state.voices.strings;
+    const inst = INSTRUMENTS[instId];
     for (const e of evs) {
       let t = when + sw + (e.off || 0) * st.stepDur + rand(-1, 1) * JITTER.gen * st.mix.human * (sty.rough || 1);
       t = Math.max(t, AC.currentTime + .005);
       if (inst instanceof HandDrum) inst.stroke(t, e.voice, e.vel * hum());
       else if (inst instanceof Bowed) {
-        const midi = bar.chord.rootMidi + (e.chordOff || 0) + (part.octave || 0);
-        inst.bow(t, midi, e.durSteps * st.stepDur, e.vel * hum());
+        const midi = e.midi != null ? e.midi : bar.chord.rootMidi + (e.chordOff || 0) + (part.octave || 0);
+        inst.bow(t, midi, (e.durSteps || 1) * st.stepDur, e.vel * hum());
       }
+      else if (inst instanceof Strings) inst.pluck(t, e.midi, e.vel * hum());
       else if (inst instanceof Jingle) inst.hit(t, e.vel * hum(), {open: e.open});
     }
   }
@@ -820,7 +920,7 @@ export function play() {
   initAudio(); AC.resume();
   const st = state;
   st.playing = true; st.stepInBar = 0; st.barIdx = 0; st.lastChordKey = null; st.lastDrone = null;
-  st.arc = null; st._secKey = null;
+  st.arc = null; st._secKey = null; resetMel();
   passageQueue.length = 0;
   st.tempo = st.tempoTarget;
   st.nextTime = AC.currentTime + .1;

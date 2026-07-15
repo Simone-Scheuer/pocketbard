@@ -8,6 +8,17 @@
 
 ## The Walking Set (2026-07-15)
 
+- 2026-07-15 · T/V · MELODIC LINE ENGINE: new `melody` generator — a flowing
+  modal line (phrase-arc, chord tones on strong beats, leans on the modal
+  colour notes, celtic grace-note ornaments, stays under the whistle in
+  register). New `fiddleLine` generator: fiddle plays a slow COUNTERMELODY,
+  not a drone. Walking tunes' plucked parts swapped from static arpeggios to
+  these. Tempos up (Rambler 104→116, Sunny 100→120 + less swing, Quiet
+  80→100). Hidden-gem progressions folded in (Rambler B & Quiet B = i-bIII-IV-i;
+  Quiet A = i-IV-i-IV naked vamp). Verified: 100%% in-scale, phrase-shaped,
+  arcs to a peak and resolves home · "chords fine but not medieval/fantasy —
+  it's the MELODIES of the strings; and too slow to play flute over"
+
 - 2026-07-15 · V/A · THREE SIMPLE PRESETS to play over forever, at top of set
   list. Sparse: plucked + bowed fiddle + soft bodhrán over a tonic drone.
   Real trad 4-chord journeys per section:
