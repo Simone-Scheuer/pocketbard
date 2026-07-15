@@ -297,6 +297,11 @@ function bindPerformance() {
     $('#blendBtn').setAttribute('aria-pressed', String(state.blend));
     persist();
   });
+  $('#fullBtn').addEventListener('click', () => {
+    state.fullBand = !state.fullBand;
+    $('#fullBtn').setAttribute('aria-pressed', String(state.fullBand));
+    persist();
+  });
 }
 
 /* ---------- workshop ---------- */
@@ -464,6 +469,7 @@ export function init() {
   $('#tempo').value = state.tempoTarget; $('#bpmOut').textContent = state.tempoTarget;
   $('#vol').value = state.volume;
   $('#blendBtn').setAttribute('aria-pressed', String(state.blend));
+  $('#fullBtn').setAttribute('aria-pressed', String(state.fullBand));
   syncFervorUI(); refreshKeyUI(); refreshChipAvail();
   raf();
   if (state.toggles.hearth) state.toggles.hearth = false; /* fire needs a tap */

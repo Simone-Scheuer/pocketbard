@@ -397,7 +397,7 @@ function buildRoster() {
     body: [{f: 95, q: 1, g: 2}],
     thock: {f: 170, q: 2, dur: .014, g: .3}});
   new Bowed({id: 'fiddle', group: 'fiddle', pan: -.18, gain: .5, attack: .18, release: .4});
-  new Bowed({id: 'accordion', group: 'air', pan: .15, gain: .4, attack: .22, release: .3});
+  new Bowed({id: 'accordion', group: 'air', pan: .15, gain: .46, attack: .12, release: .3});
   new Instrument({id: 'drone', group: 'drone', pan: -.14, gain: .4});
   new Instrument({id: 'pad', group: 'air', pan: .1, gain: .07});
   new Instrument({id: 'hearth', group: 'hearth', pan: .3, gain: .5});
@@ -577,6 +577,7 @@ function passageLen(pass, sty) {
   return pass.tag ? 2 : pass.mBars * (sty.beatsPerBar === 2 ? 2 : 1);
 }
 function roleActive(pass, pname) {
+  if (state.fullBand) return true; /* debug: whole band from bar one */
   return pass.roles === 'all' || pass.roles.includes(pname);
 }
 
@@ -664,7 +665,7 @@ function beginBar(when) {
     }
   }
   const pats = {}, gens = {};
-  if (pass.tag) {
+  if (pass.tag && !state.fullBand) {
     /* the composed ending: one unison stab, then a bar of ring-out */
     if (barInPass === 0) {
       const dots = '.'.repeat(stepsPerBar - 1);

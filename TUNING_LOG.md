@@ -8,6 +8,12 @@
 
 ## The Batch (2026-07-15, all four items shipped)
 
+- 2026-07-15 · T/G · SHANTY GRIT PASS: lute→OUD, davul-weight drum on pulse 2,
+  crew claps both pulses at rowdy, accordion stabbier (attack .22→.12, gain up,
+  notes .45→.55), drone .3→.38, rough 1.5 · "still not piratey — too delicate"
+- 2026-07-15 · P · "Full band" debug toggle (Setup, next to Blend): bypasses
+  arc role-gating and the tag so every part plays from bar one · debugging ask
+
 - 2026-07-15 · G · SHANTY JAUNTY PASS: aeolian→DORIAN (Drunken Sailor bones,
   i-bVII vamp), 84→104, bouncier drums/pluck chops, rough 1.6→1.4 · "should be
   really jaunty and yo ho ho, it's slow and moody"

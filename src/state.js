@@ -13,6 +13,7 @@ export const state = {
   voices: {strings: null, drums: null}, /* null = the tune's own pick */
   myKey: null, /* player's instrument key (pc); tunes re-tonic to fit it */
   blend: false, /* true = slow crossfades on key/tune changes; false = tight */
+  fullBand: false, /* debug: skip the song build-up, all parts from bar one */
   mix: Object.assign({}, MIX_DEFAULTS),
   customs: [], /* saved "keep this sound" cards: {id,name,base,tonic,...} */
   stepInBar: 0, barIdx: 0, nextTime: 0, stepDur: 0,
@@ -38,6 +39,7 @@ try {
     if (Array.isArray(saved.customs))
       state.customs = saved.customs.filter(c => c && c.id && STYLES[c.base]).slice(0, 20);
     if (typeof saved.blend === 'boolean') state.blend = saved.blend;
+    if (typeof saved.fullBand === 'boolean') state.fullBand = saved.fullBand;
     if (saved.volume != null) state.volume = saved.volume;
   }
 } catch (e) {}
@@ -50,6 +52,7 @@ export function persist() {
     localStorage.setItem('pocketbard', JSON.stringify({
       styleId: state.styleId, tonic: state.tonic, tempoTarget: state.tempoTarget,
       energy: state.energy, intensity: getIntensityTarget(), blend: state.blend,
+      fullBand: state.fullBand,
       myKey: state.myKey, customs: state.customs,
       volume: state.volume, toggles: state.toggles, voices: state.voices, mix: state.mix,
     }));
