@@ -6,6 +6,11 @@
   "a jingle and a tap in the background". Partially served by the new arc's
   intro/verse passages; a dedicated Understated flavor still open.
 
+- 2026-07-15 · V · LONGER SECTIONS: Festival/Tavern Jig + Céilí Dance expanded
+  from 4-chord to 8-chord sections (real journey per pass, vi-colored answers,
+  extended double-tonic) so they loop less obviously · "make loops longer, add
+  a variation on the progression then a variation on that"
+
 ## The Walking Set (2026-07-15)
 
 - 2026-07-15 · T/V · MELODIC LINE ENGINE: new `melody` generator — a flowing

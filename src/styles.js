@@ -83,8 +83,8 @@ export const STYLES = {
   tavern_jig: {
     name: 'Tavern Jig', icon: '🍺', mode: 'dorian', tonic: 2, bpm: 108,
     beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .07, reverb: .14, drone: .4, pad: 0,
-    sections: {A: [{d:0,q:'m'},{d:3,q:'M'},{d:0,q:'m'},{d:6,q:'M'}],
-               B: [{d:2,q:'M'},{d:6,q:'M'},{d:0,q:'m'},{d:6,q:'M'}]},
+    sections: {A: [{d:0,q:'m'},{d:3,q:'M'},{d:0,q:'m'},{d:6,q:'M'},{d:0,q:'m'},{d:3,q:'M'},{d:6,q:'M'},{d:0,q:'m'}],
+               B: [{d:2,q:'M'},{d:6,q:'M'},{d:3,q:'M'},{d:0,q:'m'},{d:6,q:'M'},{d:3,q:'M'},{d:0,q:'m'},{d:0,q:'m'}]},
     form: 'AABB',
     parts: {
       drums: {kind:'drum', map:'celtic',
@@ -109,8 +109,8 @@ export const STYLES = {
   festival_jig: {
     name: 'Festival Jig', icon: '🎉', mode: 'major', tonic: 0, bpm: 116,
     beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .06, reverb: .16, drone: .3, pad: 0,
-    sections: {A: [{d:0,q:'M'},{d:3,q:'M'},{d:0,q:'M'},{d:4,q:'M'}],
-               B: [{d:3,q:'M'},{d:0,q:'M'},{d:4,q:'M'},{d:0,q:'M'}]},
+    sections: {A: [{d:0,q:'M'},{d:3,q:'M'},{d:4,q:'M'},{d:0,q:'M'},{d:5,q:'m'},{d:3,q:'M'},{d:4,q:'M'},{d:0,q:'M'}],
+               B: [{d:3,q:'M'},{d:0,q:'M'},{d:4,q:'M'},{d:5,q:'m'},{d:3,q:'M'},{d:4,q:'M'},{d:0,q:'M'},{d:0,q:'M'}]},
     form: 'AABB',
     parts: {
       drums: {kind:'drum', map:'celtic',
@@ -139,8 +139,8 @@ export const STYLES = {
        double-tonic vamp, ONE idiomatic bodhrán pattern (down-up down down) */
     name: 'Céilí Dance', icon: '🍀', mode: 'mixolydian', tonic: 9, bpm: 132,
     beatsPerBar: 2, stepsPerBeat: 4, swing: .1, reverb: .13, drone: .35, pad: 0,
-    sections: {A: [{d:0,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:0,q:'5'}],
-               B: [{d:3,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:0,q:'5'}]},
+    sections: {A: [{d:0,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:0,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:0,q:'5'},{d:0,q:'5'}],
+               B: [{d:3,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:3,q:'5'},{d:0,q:'5'},{d:6,q:'5'},{d:0,q:'5'},{d:0,q:'5'}]},
     form: 'AABB',
     parts: {
       drums: {kind:'drum', map:'celtic',
