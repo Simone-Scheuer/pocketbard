@@ -109,40 +109,35 @@
   </div>
 
   <div id="viewForge" class="view" role="tabpanel">
-    <p class="wsNote">Build your own tune. It plays through the whole band and transposes to any key, just like the built-ins. Hit Preview any time.</p>
+    <div class="fgHead">
+      <input id="fgName" type="text" maxlength="28" value="My Tune" aria-label="Tune name">
+      <button id="fgPreview" class="fgHeadBtn">▶ Preview</button>
+    </div>
 
-    <section>
-      <h2>Foundation</h2>
+    <details id="fgFound">
+      <summary>Key, meter &amp; feel <span class="dis" id="fgFoundNow"></span></summary>
       <div class="fgField"><span class="fgLbl">Meter</span><div class="fgSeg" id="fgMeter"></div></div>
       <div class="fgField"><span class="fgLbl">Mode</span><div class="fgSeg" id="fgMode"></div></div>
       <div class="fgField"><span class="fgLbl">Key</span><div class="fgSeg" id="fgKey"></div></div>
       <div class="sliderRow"><span class="fgLbl">Pace</span><input id="fgTempo" type="range" min="60" max="168" step="1" value="104"><output id="fgTempoOut">104</output></div>
       <div class="sliderRow"><span class="fgLbl">Drone</span><input id="fgDrone" type="range" min="0" max="70" step="1" value="40"></div>
-    </section>
+    </details>
 
-    <section>
-      <h2>Parts &amp; Chords</h2>
-      <p class="wsNote">A tune is built from parts (A, B…), each a short chord progression. Pick a part, then tap chords to add them left to right. Tap a placed chord to change or remove it.</p>
-      <div class="fgField"><span class="fgLbl">Part</span><div id="fgSecTabs" class="fgSecTabs" role="group" aria-label="Parts"></div></div>
-      <div id="fgProg" class="fgProg" role="group" aria-label="Chord progression"></div>
-      <div class="fgBarBtns"><span id="fgBarInfo" class="fgBarInfo"></span><button id="fgClearPart" class="ghostBtn">clear part</button></div>
-      <div id="fgPalette" class="fgPalette" role="group" aria-label="Chords in key"></div>
-      <div class="fgField" style="margin-top:12px"><span class="fgLbl">Order</span><div id="fgOrder" class="fgOrder" role="group" aria-label="Play order"></div></div>
-      <p class="wsNote">The parts play in this order, then loop. Tap an order chip to remove it; use +A / +B to add.</p>
-    </section>
+    <h2>Timeline</h2>
+    <div class="fgTimeline">
+      <div id="fgParts" class="fgParts" role="group" aria-label="Parts"></div>
+      <div id="fgRuler" class="fgRuler" role="group" aria-label="Chords in the current part"></div>
+    </div>
+    <div id="fgPalette" class="fgPalette" role="group" aria-label="Chords in key"></div>
+    <div class="fgField" style="margin-top:6px"><span class="fgLbl">Order</span><div id="fgOrder" class="fgOrder" role="group" aria-label="Play order"></div></div>
 
-    <section>
-      <h2>The Band</h2>
-      <div id="fgBand"></div>
-    </section>
+    <h2>Tracks</h2>
+    <div id="fgTracks" class="fgTracks" data-drop="tracks"></div>
 
-    <section>
-      <div class="fgField"><span class="fgLbl">Name</span><input id="fgName" class="fnText" type="text" maxlength="28" value="My Tune"></div>
-      <div class="wsBtns">
-        <button id="fgPreview" class="ghostBtn">Preview</button>
-        <button id="fgSave" class="ghostBtn">Save to set list</button>
-      </div>
-    </section>
+    <p class="wsNote">Drag an instrument up into your tracks to add it. Drag it back down to remove it.</p>
+    <div id="fgShelf" class="fgShelf"></div>
+
+    <div class="wsBtns" style="margin-top:14px"><button id="fgSave" class="ghostBtn">Save to set list</button></div>
   </div>
 </div>
 

@@ -501,3 +501,71 @@ h2 .keepBtn{margin-left:auto;}
   font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:5px 8px; border-radius:6px; margin-left:4px;
   color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1px solid #2e1f0e;
 }
+
+/* ---- Forge DAW layout ---- */
+.fgHead{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.fgHead input{
+  flex:1; font-family:inherit; font-size:17px; font-weight:700; color:var(--ink);
+  background:#f7ecd0; border:1.5px solid #9a7a44; border-radius:8px; padding:8px 12px;
+}
+.fgHeadBtn{
+  font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; flex:0 0 auto; padding:9px 16px; border-radius:8px;
+  color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 60%, var(--brass-dark)); border:2px solid #4d3408;
+}
+#fgFound{margin-bottom:12px; background:rgba(96,64,26,.06); border:1.5px solid #8a6a3a; border-radius:9px; padding:8px 12px;}
+#fgFound summary{list-style:none; cursor:pointer; font-variant:small-caps; letter-spacing:.14em; font-weight:700; font-size:12px; color:var(--ink-soft);}
+#fgFound summary::-webkit-details-marker{display:none;}
+#fgFound summary .dis{font-style:italic; letter-spacing:.02em; color:#8a6a3a; margin-left:8px; font-variant:normal;}
+#fgFound[open] summary{margin-bottom:8px;}
+
+.fgTimeline{background:rgba(60,40,15,.06); border:1.5px solid #8a6a3a; border-radius:10px; padding:8px; margin-bottom:8px;}
+.fgParts{display:flex; gap:6px; margin-bottom:8px;}
+.fgSecTab{font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:6px 14px; border-radius:7px; color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1.5px solid #2e1f0e;}
+.fgSecTab[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 65%); border-color:var(--brass-dark);}
+.fgSecTab.fgAdd{color:#b8946a;}
+.fgSecTab.now{box-shadow:0 0 10px rgba(150,200,90,.8), 0 0 0 2px #8fbf4a;}
+.fgRuler{display:flex; flex-wrap:wrap; gap:5px; overflow-x:auto;}
+.fgCell{
+  position:relative; font-family:inherit; cursor:pointer; width:56px; height:54px; flex:0 0 auto; border-radius:7px;
+  background:linear-gradient(180deg,#f4e7c2,#e2cf9e); border:1.5px solid #9a7a44; color:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+}
+.fgCellN{font-size:9px; color:var(--ink-soft);}
+.fgCellC{font-size:15px; font-weight:700;}
+.fgCell.sel{border-color:var(--brass-dark); box-shadow:0 0 0 2px var(--brass);}
+.fgCell.now{border-color:#7a9a3a; box-shadow:0 0 12px rgba(150,200,90,.75), 0 0 0 2px #8fbf4a;}
+.fgCell.fgCellAdd{background:linear-gradient(180deg,#4a3620,#38260f); color:#b8946a; font-size:22px;}
+.fgCellX{position:absolute; top:-6px; right:-5px; width:17px; height:17px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #c1403e, var(--wax) 60%, #5e1414); color:#fff; font-size:10px; line-height:17px; text-align:center;}
+.fgPalette{display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-bottom:8px;}
+.fgPalHint{font-size:11.5px; color:var(--ink-soft); font-style:italic; margin-right:4px;}
+.fgChord{font-family:inherit; font-size:13.5px; font-weight:700; cursor:pointer; min-width:44px; padding:8px 11px; border-radius:7px; color:#3a2200; background:radial-gradient(circle at 50% 20%, #f2e5c0, #d8c088); border:1.5px solid #9a7a44;}
+.fgChord.fgFifth{color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border-color:#2e1f0e; font-size:11px; font-variant:small-caps;}
+.fgOrder{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
+.fgOrderChip{font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; min-width:30px; padding:5px 9px; border-radius:6px; color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 70%); border:1.5px solid var(--brass-dark);}
+.fgOrderChip.now{box-shadow:0 0 10px rgba(150,200,90,.8); border-color:#8fbf4a;}
+.fgArrow{color:var(--ink-soft); font-size:13px;}
+.fgOrderAdd{font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:5px 8px; border-radius:6px; margin-left:4px; color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1px solid #2e1f0e;}
+
+.fgTracks{min-height:70px; border:1.5px dashed #9a7a44; border-radius:10px; padding:6px; display:flex; flex-direction:column; gap:6px; margin-bottom:8px;}
+.fgTracks.fgDropOver{border-color:#8fbf4a; background:rgba(150,200,90,.12);}
+.fgEmpty{color:var(--ink-soft); font-style:italic; font-size:13px; text-align:center; padding:16px 8px;}
+.fgLane{display:flex; align-items:center; gap:8px; background:linear-gradient(180deg,#efe0c4,#ddc79a); border:1.5px solid #9a7a44; border-radius:8px; padding:6px 8px;}
+.fgLaneHead{display:flex; align-items:center; gap:7px; flex:0 0 auto; width:120px; cursor:grab; touch-action:none;}
+.fgLaneIc{font-size:18px;}
+.fgLaneNm{font-size:13px; font-weight:700; color:var(--ink);}
+.fgLaneBody{flex:1; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.fgLaneInsts{display:flex; gap:4px;}
+.fgInstOpt{font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; padding:4px 9px; border-radius:6px; color:#efe3c0; background:linear-gradient(180deg,#4a3620,#38260f); border:1px solid #2e1f0e;}
+.fgInstOpt[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 30%, var(--brass-lite), var(--brass) 70%); border-color:var(--brass-dark);}
+.fgBusy{display:flex; align-items:center; gap:6px;}
+.fgBusyLbl{font-size:10px; color:var(--ink-soft); font-variant:small-caps; letter-spacing:.1em;}
+.fgBusyRng{width:80px;}
+.fgLaneDel{flex:0 0 auto; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; color:#8a6a3a; background:none; border:none; padding:4px 6px;}
+.fgLaneDel:hover{color:var(--wax);}
+.fgShelf{display:flex; flex-wrap:wrap; gap:7px; padding:4px; border-radius:10px;}
+.fgShelf.fgDropOver{background:rgba(150,200,90,.12);}
+.fgTile{display:flex; flex-direction:column; align-items:center; gap:2px; font-family:inherit; cursor:grab; touch-action:none;
+  width:74px; padding:8px 4px; border-radius:8px; color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1.5px solid #2e1f0e;}
+.fgTileIc{font-size:20px;}
+.fgTileNm{font-size:11px; font-weight:700; text-align:center; line-height:1.1;}
+.fgGhost{border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.5);}

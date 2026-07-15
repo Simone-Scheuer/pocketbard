@@ -11,6 +11,17 @@
   extended double-tonic) so they loop less obviously · "make loops longer, add
   a variation on the progression then a variation on that"
 
+- 2026-07-15 · P · FORGE = DAW ARRANGEMENT VIEW (base-principles redesign):
+  the composition surface is now a timeline (chord cells in parts, tap to edit)
+  + instrument TRACK LANES stacked below, not a settings form. Instruments are
+  a draggable SHELF — drag a tile up into the tracks to add it, drag a lane
+  down to remove (pointer-based drag, works touch + mouse; tap + ✕ as
+  equivalents). Density "1/2/3 dots" replaced by a "busy" slider per track.
+  Foundation (key/meter/tempo) collapsed into a header details. Confirmed
+  direction w/ Simone (timeline+tracks, drag-everywhere) · "worst UI design
+  ever, it's dials not a composition canvas — build from base principles as a
+  primitive DAW"
+
 ## THE FORGE — song maker (2026-07-15)
 
 - 2026-07-15 · P · FORGE UX REDESIGN: (1) Forge tunes now use PLAIN FORM — your
