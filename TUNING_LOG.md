@@ -8,6 +8,13 @@
 
 ## The Batch (2026-07-15, all four items shipped)
 
+- 2026-07-15 · G · SHANTY JAUNTY PASS: aeolian→DORIAN (Drunken Sailor bones,
+  i-bVII vamp), 84→104, bouncier drums/pluck chops, rough 1.6→1.4 · "should be
+  really jaunty and yo ho ho, it's slow and moody"
+- 2026-07-15 · A · fiddle added to Tavern Jig, Festival Jig, Céilí Dance so the
+  arc's rise/turn passages actually add an audible layer · "stays at that low
+  level... one more instrument without sounding crowded"
+
 - 2026-07-15 · A · ARRANGEMENT ENGINE: song-arc state machine (intro→verse→
   rise→turn→peak→hush→finale→tag, ~one change per passage, composed 2-bar tag,
   endless song-shaped cycling; passage label shown in transport) · "none of
