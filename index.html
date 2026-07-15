@@ -121,16 +121,14 @@
     </section>
 
     <section>
-      <h2>Chords</h2>
-      <div id="fgSecTabs" class="fgSecTabs" role="group" aria-label="Sections"></div>
-      <div id="fgBars" class="fgBars" role="group" aria-label="Bars"></div>
-      <div class="fgBarBtns">
-        <button id="fgAddBar" class="ghostBtn">+ bar</button>
-        <button id="fgDelBar" class="ghostBtn">− bar</button>
-        <span id="fgBarInfo" class="fgBarInfo"></span>
-      </div>
-      <p class="wsNote">Tap a bar, then tap a chord to place it. Every chord shown belongs to your key.</p>
+      <h2>Parts &amp; Chords</h2>
+      <p class="wsNote">A tune is built from parts (A, B…), each a short chord progression. Pick a part, then tap chords to add them left to right. Tap a placed chord to change or remove it.</p>
+      <div class="fgField"><span class="fgLbl">Part</span><div id="fgSecTabs" class="fgSecTabs" role="group" aria-label="Parts"></div></div>
+      <div id="fgProg" class="fgProg" role="group" aria-label="Chord progression"></div>
+      <div class="fgBarBtns"><span id="fgBarInfo" class="fgBarInfo"></span><button id="fgClearPart" class="ghostBtn">clear part</button></div>
       <div id="fgPalette" class="fgPalette" role="group" aria-label="Chords in key"></div>
+      <div class="fgField" style="margin-top:12px"><span class="fgLbl">Order</span><div id="fgOrder" class="fgOrder" role="group" aria-label="Play order"></div></div>
+      <p class="wsNote">The parts play in this order, then loop. Tap an order chip to remove it; use +A / +B to add.</p>
     </section>
 
     <section>

@@ -1,7 +1,7 @@
 /* The Forge — build your own tune. Produces a full style object the engine
-   plays like any built-in: meter + mode + key + tempo, multi-section chord
-   progressions from an in-key palette, and roles → instruments → density.
-   Live preview via a '__draft' style the transport plays while you build. */
+   plays like any built-in. Forge tunes use "plain form": your parts play in
+   your order, every instrument on, looping — no hidden intro/hush/tag arc, so
+   what you build is exactly what you hear. */
 import {$, clamp} from './util.js';
 import {NOTE_NAMES, MODES} from './theory.js';
 import {STYLES, registerSong, unregisterSong} from './styles.js';
@@ -11,7 +11,6 @@ import * as engine from './engine.js';
 const METERS = [['2/4', 2, 4], ['3/4', 3, 4], ['4/4', 4, 4], ['6/8', 2, 6], ['9/8', 3, 6]];
 const MODE_LIST = [['dorian', 'Dorian'], ['major', 'Major'], ['mixolydian', 'Mixolydian'],
   ['aeolian', 'Minor'], ['phrygian', 'Phrygian'], ['hijaz', 'Hijaz']];
-const ICONS = ['🎵', '🍺', '🌿', '🕯️', '⚔️', '🦋', '🌙', '☀️', '🥾', '🍀', '🔥', '🐉', '🏰', '🌊'];
 
 /* ---- pattern synthesis: valid-length strings from a density 1..3 ---- */
 function mkDrum(m, dens) {
@@ -53,7 +52,7 @@ const threePat = (mk, m, d) => ({
 /* ---- roles: how a UI choice becomes an engine part ---- */
 const ROLES = [
   {key: 'melody', label: 'Melody', insts: ['harp', 'lute', 'oud'],
-    build: r => ({kind: 'gen', inst: r.inst, gen: 'melody', base: r.register, density: [.4, .7, 1][r.dens - 1]})},
+    build: r => ({kind: 'gen', inst: r.inst, gen: 'melody', base: 60, density: [.4, .7, 1][r.dens - 1]})},
   {key: 'harmony', label: 'Harmony', insts: ['lute', 'harp', 'oud'],
     build: (r, m) => ({kind: 'harmony', inst: r.inst, pat: threePat(mkHarm, m, r.dens)})},
   {key: 'bass', label: 'Bass', insts: ['bassViol'],
@@ -78,17 +77,22 @@ const INST_LABEL = {harp: 'Harp', lute: 'Lute', oud: 'Oud', bassViol: 'Bass', bo
 /* ---- the draft ---- */
 let draft = null;
 let activeSec = 'A';
-let selBar = 0;
+let selChord = -1; /* -1 = append mode; >=0 = a selected chord being edited */
 
+function starterProg(mode) {
+  return mode === 'major' || mode === 'mixolydian'
+    ? [{d: 0, q: 'M'}, {d: 3, q: 'M'}, {d: 4, q: 'M'}, {d: 0, q: 'M'}]
+    : [{d: 0, q: 'm'}, {d: 3, q: 'M'}, {d: 6, q: 'M'}, {d: 0, q: 'm'}];
+}
 function newDraft() {
   return {
-    id: '__draft', _user: true, name: 'My Tune', icon: '🎵',
+    id: '__draft', _user: true, plain: true, name: 'My Tune', icon: '🎵',
     mode: 'dorian', tonic: 2, bpm: 104, beatsPerBar: 4, stepsPerBeat: 4,
     swing: 0, lilt: 0, reverb: .16, drone: .4, pad: 0,
-    sections: {A: [{d: 0, q: 'm'}, {d: 6, q: 'M'}, {d: 3, q: 'M'}, {d: 0, q: 'm'}]},
-    form: 'AABB',
+    sections: {A: starterProg('dorian')},
+    order: ['A'], form: 'AABB',
     _roles: {
-      melody: {on: true, inst: 'harp', dens: 2, register: 60},
+      melody: {on: true, inst: 'harp', dens: 2},
       harmony: {on: false, inst: 'lute', dens: 2},
       bass: {on: true, inst: 'bassViol', dens: 2},
       drum: {on: true, inst: 'bodhran', dens: 2},
@@ -101,32 +105,25 @@ function newDraft() {
   };
 }
 
-/* rebuild the engine-facing parts from the role settings, and register the
-   draft so the transport previews it live */
+/* rebuild engine-facing parts from role settings and register the draft */
 function commit() {
   draft.parts = {};
-  for (const role of ROLES) {
-    const r = draft._roles[role.key];
-    if (r.on) draft.parts[role.key] = role.build(r, draft);
-  }
+  for (const role of ROLES) { const r = draft._roles[role.key]; if (r.on) draft.parts[role.key] = role.build(r, draft); }
   registerSong(draft);
-  refreshChordsUI();
 }
 
-/* diatonic chord palette for the current mode, plus the two classic borrows */
+/* diatonic chords for the current mode */
 function palette() {
   const iv = MODES[draft.mode].iv, N = iv.length, out = [];
   for (let d = 0; d < N; d++) {
     const third = (((iv[(d + 2) % N] - iv[d]) % 12) + 12) % 12;
-    const q = third === 4 ? 'M' : 'm';
-    out.push({d, q, name: chordName(d, q)});
+    out.push({d, q: third === 4 ? 'M' : 'm'});
   }
-  /* colour borrows: ♭III and ♭VII as major, if not already the diatonic quality */
   return out;
 }
 function chordName(d, q) {
-  const iv = MODES[draft.mode].iv;
-  const pc = (draft.tonic + iv[d % iv.length] + (d >= iv.length ? 12 : 0)) % 12;
+  const iv = MODES[draft.mode].iv, N = iv.length;
+  const pc = (draft.tonic + iv[d % N] + (d >= N ? 12 : 0)) % 12;
   return NOTE_NAMES[pc] + (q === 'm' ? 'm' : q === '5' ? '5' : '');
 }
 
@@ -138,10 +135,13 @@ export function initForge() {
   $('#fgName').addEventListener('input', e => { draft.name = e.target.value.slice(0, 28); });
   $('#fgSave').addEventListener('click', saveSong);
   $('#fgPreview').addEventListener('click', preview);
+  $('#fgClearPart').addEventListener('click', () => { draft.sections[activeSec] = starterProg(draft.mode); selChord = -1; commit(); refreshProg(); });
+  engine.on('forge-now', showNow);
   commit();
-  buildSectionTabs();
-  refreshChordsUI();
+  buildPartTabs();
   buildPalette();
+  refreshProg();
+  buildOrder();
 }
 
 function seg(container, items, active, onPick) {
@@ -158,105 +158,133 @@ function seg(container, items, active, onPick) {
 function buildFoundation() {
   seg('#fgMeter', METERS.map(m => [m[0], m[0]]), () => draft.beatsPerBar + '/' + (draft.stepsPerBeat === 6 ? 8 : 4),
     v => { const m = METERS.find(x => x[0] === v); draft.beatsPerBar = m[1]; draft.stepsPerBeat = m[2];
-      draft.lilt = m[2] === 6 ? .06 : 0; draft.swing = 0; clampAllSections(); commit(); refreshChordsUI(); });
-  seg('#fgMode', MODE_LIST, () => draft.mode, v => { draft.mode = v; commit(); buildPalette(); refreshChordsUI(); });
+      draft.lilt = m[2] === 6 ? .06 : 0; draft.swing = 0; commit(); });
+  seg('#fgMode', MODE_LIST, () => draft.mode, v => { draft.mode = v; commit(); buildPalette(); refreshProg(); });
   const keyWrap = $('#fgKey'); keyWrap.textContent = '';
   NOTE_NAMES.forEach((n, pc) => {
     const b = document.createElement('button'); b.className = 'fgKeyBtn'; b.textContent = n;
     b.setAttribute('aria-pressed', String(pc === draft.tonic));
     b.addEventListener('click', () => { draft.tonic = pc; for (const o of keyWrap.children) o.setAttribute('aria-pressed', String(o === b));
-      commit(); buildPalette(); refreshChordsUI(); });
+      commit(); buildPalette(); refreshProg(); });
     keyWrap.appendChild(b);
   });
-  $('#fgTempo').addEventListener('input', e => { draft.bpm = +e.target.value; $('#fgTempoOut').textContent = e.target.value; draft.tempo = draft.bpm; });
+  $('#fgTempo').addEventListener('input', e => { draft.bpm = +e.target.value; $('#fgTempoOut').textContent = e.target.value; });
   $('#fgTempo').value = draft.bpm; $('#fgTempoOut').textContent = draft.bpm;
   $('#fgDrone').addEventListener('input', e => { draft.drone = +e.target.value / 100; commit(); });
   $('#fgDrone').value = Math.round(draft.drone * 100);
 }
-function clampAllSections() {
-  /* sections stay valid regardless of meter (chords are degree specs) */
-}
 
-function buildSectionTabs() {
+/* ---- parts (sections) ---- */
+function buildPartTabs() {
   const wrap = $('#fgSecTabs'); wrap.textContent = '';
   for (const name of Object.keys(draft.sections)) {
     const b = document.createElement('button'); b.className = 'fgSecTab'; b.textContent = name;
     b.setAttribute('aria-pressed', String(name === activeSec));
-    b.addEventListener('click', () => { activeSec = name; selBar = 0; buildSectionTabs(); refreshChordsUI(); });
+    b.addEventListener('click', () => { activeSec = name; selChord = -1; buildPartTabs(); refreshProg(); });
     wrap.appendChild(b);
   }
   if (Object.keys(draft.sections).length < 4) {
     const add = document.createElement('button'); add.className = 'fgSecTab fgAdd'; add.textContent = '+';
-    add.title = 'Add a section';
+    add.title = 'Add a part';
     add.addEventListener('click', () => {
       const next = ['A', 'B', 'C', 'D'].find(n => !(n in draft.sections));
-      draft.sections[next] = [{d: 0, q: draft.mode === 'major' || draft.mode === 'mixolydian' ? 'M' : 'm'}];
-      draft.form = Object.keys(draft.sections).join('').replace(/(.)/g, '$1$1'); /* AABBCC... */
-      activeSec = next; selBar = 0; commit(); buildSectionTabs(); refreshChordsUI();
+      draft.sections[next] = starterProg(draft.mode);
+      draft.order.push(next);
+      activeSec = next; selChord = -1; commit(); buildPartTabs(); refreshProg(); buildOrder();
     });
     wrap.appendChild(add);
   }
 }
 
-function refreshChordsUI() {
-  const grid = $('#fgBars'); if (!grid) return; grid.textContent = '';
+/* ---- chord progression (chips) ---- */
+function refreshProg() {
+  const wrap = $('#fgProg'); if (!wrap) return; wrap.textContent = '';
   const bars = draft.sections[activeSec] || [];
   bars.forEach((spec, i) => {
-    const cell = document.createElement('button');
-    cell.className = 'fgBar'; cell.setAttribute('aria-pressed', String(i === selBar));
-    cell.innerHTML = '<span class="fgBarN">' + (i + 1) + '</span><span class="fgBarC">' + chordName(spec.d, spec.q) + '</span>';
-    cell.addEventListener('click', () => { selBar = i; refreshChordsUI(); });
-    grid.appendChild(cell);
+    const chip = document.createElement('button');
+    chip.className = 'fgChip' + (i === selChord ? ' sel' : '');
+    chip.dataset.i = i;
+    chip.innerHTML = '<span class="fgChipC">' + chordName(spec.d, spec.q) + '</span>' +
+      (i === selChord ? '<span class="fgChipX" role="button" aria-label="remove chord">✕</span>' : '');
+    chip.addEventListener('click', e => {
+      if (e.target.classList.contains('fgChipX')) { removeChord(i); return; }
+      selChord = (selChord === i) ? -1 : i; refreshProg();
+    });
+    wrap.appendChild(chip);
   });
-  $('#fgBarInfo').textContent = activeSec + ' · ' + bars.length + ' bars';
+  $('#fgBarInfo').textContent = selChord >= 0
+    ? 'editing chord ' + (selChord + 1) + ' — tap a chord below to change it'
+    : bars.length + ' chord' + (bars.length === 1 ? '' : 's') + ' — tap a chord below to add';
+}
+function removeChord(i) {
+  const bars = draft.sections[activeSec];
+  if (bars.length <= 1) return;
+  bars.splice(i, 1); selChord = -1; commit(); refreshProg();
+}
+function placeChord(d, q) {
+  const bars = draft.sections[activeSec];
+  if (selChord >= 0 && selChord < bars.length) { bars[selChord] = {d, q}; }
+  else if (bars.length < 16) { bars.push({d, q}); }
+  commit(); refreshProg();
 }
 
 function buildPalette() {
   const wrap = $('#fgPalette'); if (!wrap) return; wrap.textContent = '';
   for (const c of palette()) {
-    const b = document.createElement('button'); b.className = 'fgChord';
-    b.innerHTML = c.name;
-    b.addEventListener('click', () => setChord(c.d, c.q));
+    const b = document.createElement('button'); b.className = 'fgChord'; b.textContent = chordName(c.d, c.q);
+    b.addEventListener('click', () => placeChord(c.d, c.q));
     wrap.appendChild(b);
   }
-  /* power-fifth + colour borrows */
   const fifth = document.createElement('button'); fifth.className = 'fgChord fgFifth';
   fifth.textContent = 'open 5th'; fifth.title = 'make the selected chord an open fifth (no third)';
-  fifth.addEventListener('click', () => { const b = draft.sections[activeSec][selBar]; if (b) { b.q = '5'; commit(); refreshChordsUI(); } });
+  fifth.addEventListener('click', () => { const b = draft.sections[activeSec][selChord]; if (b) { b.q = '5'; commit(); refreshProg(); } });
   wrap.appendChild(fifth);
 }
-function setChord(d, q) {
-  const bars = draft.sections[activeSec];
-  if (!bars[selBar]) return;
-  bars[selBar] = {d, q};
-  commit(); refreshChordsUI();
-  if (selBar < bars.length - 1) { selBar++; refreshChordsUI(); } /* advance for fast entry */
+
+/* ---- play order (arrangement) ---- */
+function buildOrder() {
+  const wrap = $('#fgOrder'); if (!wrap) return; wrap.textContent = '';
+  draft.order.forEach((name, i) => {
+    const chip = document.createElement('button'); chip.className = 'fgOrderChip'; chip.textContent = name;
+    chip.title = 'tap to remove from the order';
+    chip.addEventListener('click', () => { if (draft.order.length > 1) { draft.order.splice(i, 1); commit(); buildOrder(); } });
+    wrap.appendChild(chip);
+    const arrow = document.createElement('span'); arrow.className = 'fgArrow'; arrow.textContent = '→';
+    wrap.appendChild(arrow);
+  });
+  const loop = document.createElement('span'); loop.className = 'fgArrow'; loop.textContent = '↻';
+  wrap.appendChild(loop);
+  /* add-a-part buttons */
+  for (const name of Object.keys(draft.sections)) {
+    const add = document.createElement('button'); add.className = 'fgOrderAdd'; add.textContent = '+' + name;
+    add.title = 'add part ' + name + ' to the order';
+    add.addEventListener('click', () => { draft.order.push(name); commit(); buildOrder(); });
+    wrap.appendChild(add);
+  }
 }
 
-/* add / remove bars in the active section */
-export function forgeAddBar() {
-  const bars = draft.sections[activeSec];
-  if (bars.length >= 16) return;
-  bars.push({...(bars[bars.length - 1] || {d: 0, q: 'm'})});
-  selBar = bars.length - 1; commit(); refreshChordsUI();
+/* ---- now-playing highlight during preview ---- */
+function showNow({part, bar}) {
+  if (state.styleId !== '__draft') return;
+  const fv = $('#viewForge'); if (!fv || !fv.classList.contains('active')) return;
+  for (const t of document.querySelectorAll('#fgSecTabs .fgSecTab')) t.classList.toggle('now', t.textContent === part);
+  for (const c of document.querySelectorAll('#fgProg .fgChip')) c.classList.toggle('now', part === activeSec && +c.dataset.i === bar);
+  for (const o of document.querySelectorAll('#fgOrder .fgOrderChip')) o.classList.toggle('now', o.textContent === part);
 }
-export function forgeDelBar() {
-  const bars = draft.sections[activeSec];
-  if (bars.length <= 1) return;
-  bars.splice(selBar, 1); selBar = Math.min(selBar, bars.length - 1); commit(); refreshChordsUI();
+function clearNow() {
+  for (const el of document.querySelectorAll('.fgSecTab.now, .fgChip.now, .fgOrderChip.now')) el.classList.remove('now');
 }
 
+/* ---- band ---- */
 function buildBand() {
   const wrap = $('#fgBand'); wrap.textContent = '';
   for (const role of ROLES) {
     const r = draft._roles[role.key];
     const row = document.createElement('div'); row.className = 'fgRole';
-    /* on/off */
     const tog = document.createElement('button'); tog.className = 'fgRoleTog'; tog.textContent = role.label;
     tog.setAttribute('aria-pressed', String(r.on));
     tog.addEventListener('click', () => { r.on = !r.on; tog.setAttribute('aria-pressed', String(r.on)); row.classList.toggle('off', !r.on); commit(); });
     row.appendChild(tog);
-    /* instrument choices */
     if (role.insts.length > 1) {
       const iw = document.createElement('div'); iw.className = 'fgInsts';
       for (const inst of role.insts) {
@@ -267,7 +295,6 @@ function buildBand() {
       }
       row.appendChild(iw);
     }
-    /* density */
     if (role.key !== 'fiddle' && role.key !== 'accordion') {
       const dw = document.createElement('div'); dw.className = 'fgDens';
       ['·', '··', '···'].forEach((lab, i) => {
@@ -284,20 +311,18 @@ function buildBand() {
   }
 }
 
-/* preview: register draft, point the transport at it, play */
+/* ---- transport / save ---- */
 function preview() {
   commit();
-  const wasPlaying = state.playing;
-  if (state.playing) { state.pending.styleId = '__draft'; state.pending.tonic = draft.tonic; }
+  if (state.playing && state.styleId !== '__draft') { state.pending.styleId = '__draft'; state.pending.tonic = draft.tonic; }
+  else if (state.playing) engine.togglePlay();
   else { state.styleId = '__draft'; state.tonic = draft.tonic; engine.togglePlay(); }
-  $('#fgPreview').textContent = state.playing ? 'Stop' : 'Preview';
 }
-
 function saveSong() {
   const name = (draft.name || 'My Tune').slice(0, 28);
   const id = 'song_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const song = JSON.parse(JSON.stringify(draft));
-  song.id = id; song.name = name; song._user = true;
+  song.id = id; song.name = name; song._user = true; song.plain = true;
   registerSong(song);
   state.songs.push(song);
   if (state.songs.length > 40) { const drop = state.songs.shift(); unregisterSong(drop.id); }
@@ -307,10 +332,11 @@ function saveSong() {
 }
 
 export function forgeOnShow() {
-  /* register the draft so Preview can play it; don't hijack the main transport */
   commit();
   $('#fgName').value = draft.name;
+  refreshProg();
 }
 export function forgeTransport(playing) {
-  const b = $('#fgPreview'); if (b) b.textContent = playing ? 'Stop' : 'Preview';
+  const b = $('#fgPreview'); if (b) b.textContent = playing && state.styleId === '__draft' ? 'Stop preview' : 'Preview';
+  if (!playing) clearNow();
 }

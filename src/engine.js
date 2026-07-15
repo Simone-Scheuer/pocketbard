@@ -711,24 +711,42 @@ function beginBar(when) {
       applyReverb(when);
     }
     if (st.pending.tonic !== undefined) st.tonic = st.pending.tonic;
-    st.pending = {}; st.lastDrone = null; st.arc = null; /* new tune, fresh arc */
+    st.pending = {}; st.lastDrone = null; st.arc = null; st.plain = null; /* new tune, fresh form */
     resetMel();
   }
   const sty = STYLES[st.styleId];
   const stepsPerBar = sty.beatsPerBar * sty.stepsPerBeat;
-  /* advance the song arc */
-  if (!st.arc) { st.arc = {p: 0, bar: 0}; passageQueue.push({t: when, label: ARC[0].label}); }
-  let pass = ARC[st.arc.p];
-  if (st.arc.bar >= passageLen(pass, sty)) {
-    st.arc.p = (st.arc.p + 1) % ARC.length;
-    st.arc.bar = 0;
+  let pass, barInPass, plen, secChords, formPos;
+  if (sty.plain) {
+    /* plain form (the Forge): play the user's parts in their order, every
+       instrument on, looping — no hidden intro/hush/tag. What you built is
+       what plays. */
+    const order = (sty.order && sty.order.length) ? sty.order : Object.keys(sty.sections);
+    if (!st.plain) { st.plain = {idx: 0, bar: 0}; }
+    let part = order[st.plain.idx % order.length];
+    secChords = sty.sections[part] || sty.sections[Object.keys(sty.sections)[0]] || [{d: 0, q: 'm'}];
+    if (st.plain.bar >= secChords.length) {
+      st.plain.idx = (st.plain.idx + 1) % order.length; st.plain.bar = 0;
+      part = order[st.plain.idx % order.length];
+      secChords = sty.sections[part] || secChords;
+    }
+    barInPass = st.plain.bar; st.plain.bar++;
+    plen = secChords.length; formPos = 'p' + st.plain.idx;
+    pass = {id: 'plain', roles: 'all', sec: part};
+    emit('forge-now', {part, bar: barInPass, len: secChords.length});
+  } else {
+    /* advance the song arc */
+    if (!st.arc) { st.arc = {p: 0, bar: 0}; passageQueue.push({t: when, label: ARC[0].label}); }
     pass = ARC[st.arc.p];
-    passageQueue.push({t: when, label: pass.label});
+    if (st.arc.bar >= passageLen(pass, sty)) {
+      st.arc.p = (st.arc.p + 1) % ARC.length; st.arc.bar = 0;
+      pass = ARC[st.arc.p];
+      passageQueue.push({t: when, label: pass.label});
+    }
+    barInPass = st.arc.bar; st.arc.bar++;
+    plen = passageLen(pass, sty); formPos = st.arc.p;
+    secChords = sty.sections[pass.sec] || sty.sections.A;
   }
-  const barInPass = st.arc.bar;
-  st.arc.bar++;
-  const plen = passageLen(pass, sty);
-  const secChords = sty.sections[pass.sec] || sty.sections.A;
   const spec = pass.tag ? secChords[0] : secChords[barInPass % secChords.length];
   const nextSpec = pass.tag ? secChords[0] : secChords[(barInPass + 1) % secChords.length];
   const chord = makeChord(st.tonic, sty.mode, spec);
@@ -738,7 +756,7 @@ function beginBar(when) {
   const band = conductor.band();
   /* the band picks its groove once per passage-quarter and rides it —
      repetition is the accompanist's job; the flute owns the variation */
-  const secKey = st.styleId + ':' + band + ':' + st.arc.p + ':' + Math.floor(barInPass / 4);
+  const secKey = st.styleId + ':' + band + ':' + formPos + ':' + Math.floor(barInPass / 4);
   if (st._secKey !== secKey) {
     st._secKey = secKey;
     st._secPats = {};
@@ -927,7 +945,7 @@ export function play() {
   initAudio(); AC.resume();
   const st = state;
   st.playing = true; st.stepInBar = 0; st.barIdx = 0; st.lastChordKey = null; st.lastDrone = null;
-  st.arc = null; st._secKey = null; resetMel();
+  st.arc = null; st.plain = null; st._secKey = null; resetMel();
   passageQueue.length = 0;
   st.tempo = st.tempoTarget;
   st.nextTime = AC.currentTime + .1;

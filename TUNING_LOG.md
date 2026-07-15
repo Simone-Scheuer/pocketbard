@@ -13,6 +13,15 @@
 
 ## THE FORGE — song maker (2026-07-15)
 
+- 2026-07-15 · P · FORGE UX REDESIGN: (1) Forge tunes now use PLAIN FORM — your
+  parts play in your order, all instruments on, looping; NO hidden intro/hush/
+  tag arc (engine `sty.plain` path). (2) Chords are chips you build left-to-
+  right: tap palette to append, tap a chip to select+replace, ✕ to remove.
+  (3) Visible + editable play ORDER (A→B→↻, +A/+B). (4) Now-playing highlight
+  on the part tab + current chord during preview. (5) Clearer labels/copy
+  ("Parts", explanations) · "chord system hard to use, unclear what A/B/C/D do,
+  couldn't tell why things played, don't impose song structure"
+
 - 2026-07-15 · T · melody grace-note ornaments cut ~16%%->5%% per strong beat + no-two-in-a-row guard · "double-stops way too much, sounds odd"
 
 - 2026-07-15 · FEATURE · The Forge: third tab to build your own tunes.

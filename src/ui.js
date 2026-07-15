@@ -468,8 +468,6 @@ function switchViewTo(tabSel) {
 }
 function bindViews() {
   for (const [tabSel] of VIEW_TABS) $(tabSel).addEventListener('click', () => switchViewTo(tabSel));
-  $('#fgAddBar').addEventListener('click', forge.forgeAddBar);
-  $('#fgDelBar').addEventListener('click', forge.forgeDelBar);
   document.addEventListener('forge-saved', e => {
     buildCards();
     const id = e.detail.id;

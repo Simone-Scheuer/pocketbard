@@ -470,3 +470,34 @@ h2 .keepBtn{margin-left:auto;}
 .fgDens{margin-left:auto;}
 .fgInstOpt[aria-pressed="true"], .fgDensOpt[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 30%, var(--brass-lite), var(--brass) 70%); border-color:var(--brass-dark);}
 #viewForge input[type=text].fnText{flex:1;}
+
+/* ---- Forge: chord chips + order + now-playing ---- */
+.fgProg{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; min-height:52px;}
+.fgChip{
+  position:relative; font-family:inherit; cursor:pointer; min-width:52px; height:50px; padding:0 12px; border-radius:8px;
+  background:linear-gradient(180deg,#f2e5bd,#e0cc98); border:1.5px solid #9a7a44; color:var(--ink);
+  display:flex; align-items:center; justify-content:center;
+}
+.fgChipC{font-size:16px; font-weight:700;}
+.fgChip.sel{border-color:var(--brass-dark); box-shadow:0 0 0 2px var(--brass);}
+.fgChip.now{
+  border-color:#7a9a3a;
+  box-shadow:0 0 12px rgba(150,200,90,.7), 0 0 0 2px #8fbf4a;
+}
+.fgChipX{
+  position:absolute; top:-7px; right:-6px; width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #c1403e, var(--wax) 60%, #5e1414); color:#fff;
+  font-size:11px; line-height:18px; text-align:center; font-weight:700;
+}
+.fgSecTab.now{box-shadow:0 0 10px rgba(150,200,90,.7), 0 0 0 2px #8fbf4a;}
+.fgOrder{display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
+.fgOrderChip{
+  font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; min-width:30px; padding:5px 9px; border-radius:6px;
+  color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 70%); border:1.5px solid var(--brass-dark);
+}
+.fgOrderChip.now{box-shadow:0 0 10px rgba(150,200,90,.8); border-color:#8fbf4a;}
+.fgArrow{color:var(--ink-soft); font-size:13px; padding:0 1px;}
+.fgOrderAdd{
+  font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:5px 8px; border-radius:6px; margin-left:4px;
+  color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1px solid #2e1f0e;
+}
