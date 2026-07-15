@@ -13,9 +13,15 @@
 - **V · Understated mode**: ref Justin Bell "The Fox and the Farmer" (PoE) —
   "a jingle and a tap in the background", maximal space for the flute. Maybe
   Calm should be this by default; or an "Understated" arrangement flavor.
-- **G/T · Shanty isn't piratey**: needs the genre signifiers (research pending).
-- **G · Kerry Polka isn't diddly enough**: fun but not classic-Irish-reading
-  (research pending).
+- **G/T · Shanty isn't piratey**: research DONE — swung 6/8 + hemiola,
+  accordion bed (CC0 source verified), halyard one-pull-per-bar + gang answer,
+  roughness. See research addendum.
+- **G · Kerry Polka isn't diddly enough**: research DONE — boom-chick voicing,
+  no thirds, double-tonic, phrase-aware bar-8 lift, one bodhrán pattern.
+- **T · Bowed voice sources verified**: VSCO solo violin/viola/cello sustains
+  (CC0), synth formant fallback recipe in research addendum.
+- **A · Arrangement grammar defined**: section state machine INTRO→A→A+→B→
+  A3→BREAKDOWN→FINAL→TAG, one change per 8 bars, composed tag.
 
 ## Reference deck (growing)
 
