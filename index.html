@@ -25,6 +25,7 @@
   <nav id="viewTabs" role="tablist" aria-label="Board pages">
     <button id="tabPlay" role="tab" aria-selected="true">▶ Play</button>
     <button id="tabSetup" role="tab" aria-selected="false">⚙ Setup</button>
+    <button id="tabForge" role="tab" aria-selected="false">⚒ Forge</button>
   </nav>
 
   <div id="viewPlay" class="view active" role="tabpanel">
@@ -105,6 +106,45 @@
     </section>
 
     <p class="tip">No sound? Flip your phone off silent. The screen stays awake while the band plays.</p>
+  </div>
+
+  <div id="viewForge" class="view" role="tabpanel">
+    <p class="wsNote">Build your own tune. It plays through the whole band and transposes to any key, just like the built-ins. Hit Preview any time.</p>
+
+    <section>
+      <h2>Foundation</h2>
+      <div class="fgField"><span class="fgLbl">Meter</span><div class="fgSeg" id="fgMeter"></div></div>
+      <div class="fgField"><span class="fgLbl">Mode</span><div class="fgSeg" id="fgMode"></div></div>
+      <div class="fgField"><span class="fgLbl">Key</span><div class="fgSeg" id="fgKey"></div></div>
+      <div class="sliderRow"><span class="fgLbl">Pace</span><input id="fgTempo" type="range" min="60" max="168" step="1" value="104"><output id="fgTempoOut">104</output></div>
+      <div class="sliderRow"><span class="fgLbl">Drone</span><input id="fgDrone" type="range" min="0" max="70" step="1" value="40"></div>
+    </section>
+
+    <section>
+      <h2>Chords</h2>
+      <div id="fgSecTabs" class="fgSecTabs" role="group" aria-label="Sections"></div>
+      <div id="fgBars" class="fgBars" role="group" aria-label="Bars"></div>
+      <div class="fgBarBtns">
+        <button id="fgAddBar" class="ghostBtn">+ bar</button>
+        <button id="fgDelBar" class="ghostBtn">− bar</button>
+        <span id="fgBarInfo" class="fgBarInfo"></span>
+      </div>
+      <p class="wsNote">Tap a bar, then tap a chord to place it. Every chord shown belongs to your key.</p>
+      <div id="fgPalette" class="fgPalette" role="group" aria-label="Chords in key"></div>
+    </section>
+
+    <section>
+      <h2>The Band</h2>
+      <div id="fgBand"></div>
+    </section>
+
+    <section>
+      <div class="fgField"><span class="fgLbl">Name</span><input id="fgName" class="fnText" type="text" maxlength="28" value="My Tune"></div>
+      <div class="wsBtns">
+        <button id="fgPreview" class="ghostBtn">Preview</button>
+        <button id="fgSave" class="ghostBtn">Save to set list</button>
+      </div>
+    </section>
   </div>
 </div>
 

@@ -11,6 +11,16 @@
   extended double-tonic) so they loop less obviously · "make loops longer, add
   a variation on the progression then a variation on that"
 
+## THE FORGE — song maker (2026-07-15)
+
+- 2026-07-15 · FEATURE · The Forge: third tab to build your own tunes.
+  Foundation (meter/mode/key/tempo/drone) + Chords (multi-section, tap-to-place
+  in-key palette + open-fifth) + Band (8 roles -> instrument -> density). Saves
+  a full style that plays through engine+arc, transposes any key, lands in set
+  list (deletable). forge.js; state.songs persisted+registered; pattern synth
+  from density; melody gen density knob. Verified: edit/preview/save/reload/
+  transpose/delete, peak .76, clean.
+
 ## The Walking Set (2026-07-15)
 
 - 2026-07-15 · T/V · MELODIC LINE ENGINE: new `melody` generator — a flowing

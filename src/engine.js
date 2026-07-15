@@ -490,7 +490,11 @@ export const GENERATORS = {
     const colour = (ctx.mode === 'dorian' || ctx.mode === 'mixolydian') ? [5, 6] : [6];
     const R6 = [[0,2,4,6,8,10],[0,3,4,6,9,10],[0,2,3,5,6,8,9,11],[0,2,4,5,6,8,10,11],[0,3,6,8,9,11]];
     const R4 = [[0,2,4,6,8,10,12,14],[0,3,4,6,8,11,12,14],[0,2,4,6,8,10,12,13,14],[0,4,6,8,10,12,14],[0,2,3,4,8,10,11,12]];
-    const rhythm = choice(ctx.stepsPerBeat === 6 ? R6 : R4);
+    let rhythm = choice(ctx.stepsPerBeat === 6 ? R6 : R4);
+    /* density knob (Forge): thin the line, always keeping the strong beats */
+    const dens = part.density;
+    if (dens != null && dens < 1)
+      rhythm = rhythm.filter(st => st % ctx.stepsPerBeat === 0 || Math.random() < dens);
     const rising = s.phraseBar < 2;
     const lastIdx = rhythm.length - 1;
     const ev = [];

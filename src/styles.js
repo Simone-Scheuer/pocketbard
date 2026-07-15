@@ -369,6 +369,11 @@ export const STYLES = {
     }},
 };
 
+/* user-authored songs (from the Forge) are registered into the same map so
+   they play, transpose, and appear in the set list exactly like built-ins */
+export function registerSong(song) { STYLES[song.id] = song; }
+export function unregisterSong(id) { delete STYLES[id]; }
+
 /* boot-time sanity: warn on any pattern string whose length ≠ steps per
    bar, and on parts pointing at unknown generators/maps */
 export function validateStyles(generators) {

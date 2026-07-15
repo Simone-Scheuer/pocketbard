@@ -1,5 +1,5 @@
 import {clamp} from './util.js';
-import {STYLES} from './styles.js';
+import {STYLES, registerSong} from './styles.js';
 
 export const MIX_DEFAULTS = {
   drums: 1, jingle: 1, strings: 1, fiddle: 1, bass: 1, drone: 1, air: 1, texture: 1,
@@ -11,6 +11,7 @@ export const state = {
   tempo: 108, tempoTarget: 108, volume: .8,
   toggles: {drums: true, jingle: true, pluck: true, fiddle: true, bass: true, drone: true, pad: true, hearth: false},
   voices: {strings: null, drums: null}, /* null = the tune's own pick */
+  songs: [], /* user-authored full-style Songs from the Forge */
   myKey: null, /* player's instrument key (pc); tunes re-tonic to fit it */
   blend: false, /* true = slow crossfades on key/tune changes; false = tight */
   fullBand: false, /* debug: skip the song build-up, all parts from bar one */
@@ -36,6 +37,10 @@ try {
     }
     if (typeof saved.intensity === 'number') state._li = clamp(saved.intensity, 0, 1);
     if (Number.isInteger(saved.myKey)) state.myKey = saved.myKey;
+    if (Array.isArray(saved.songs)) {
+      state.songs = saved.songs.filter(s => s && s.id && s.sections && s.parts).slice(0, 40);
+      for (const s of state.songs) registerSong(s); /* into the play registry */
+    }
     if (Array.isArray(saved.customs))
       state.customs = saved.customs.filter(c => c && c.id && STYLES[c.base]).slice(0, 20);
     if (typeof saved.blend === 'boolean') state.blend = saved.blend;
@@ -53,7 +58,7 @@ export function persist() {
       styleId: state.styleId, tonic: state.tonic, tempoTarget: state.tempoTarget,
       energy: state.energy, intensity: getIntensityTarget(), blend: state.blend,
       fullBand: state.fullBand,
-      myKey: state.myKey, customs: state.customs,
+      myKey: state.myKey, customs: state.customs, songs: state.songs,
       volume: state.volume, toggles: state.toggles, voices: state.voices, mix: state.mix,
     }));
   } catch (e) {}

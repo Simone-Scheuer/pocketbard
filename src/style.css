@@ -413,3 +413,60 @@ h2 .keepBtn{margin-left:auto;}
   border:1.5px dashed rgba(120,85,40,.38); border-radius:7px;
 }
 #viewSetup details[open]{padding-bottom:16px;}
+
+/* ---- The Forge (song maker) ---- */
+.fgField{display:flex; align-items:center; gap:10px; margin:8px 0;}
+.fgLbl{font-size:12px; color:var(--ink-soft); font-variant:small-caps; letter-spacing:.1em;
+  font-weight:700; width:60px; flex:0 0 auto;}
+.fgSeg{display:flex; flex-wrap:wrap; gap:6px;}
+.fgOpt, .fgKeyBtn{
+  font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer;
+  padding:6px 12px; border-radius:7px; color:#efe3c0;
+  background:linear-gradient(180deg,#5d452a,#43301a); border:1.5px solid #2e1f0e;
+}
+.fgKeyBtn{padding:6px 9px;}
+.fgOpt[aria-pressed="true"], .fgKeyBtn[aria-pressed="true"]{
+  color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 65%, var(--brass-dark)); border-color:var(--brass-dark);
+}
+.fgSecTabs{display:flex; gap:6px; margin-bottom:8px;}
+.fgSecTab{
+  font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; width:38px; padding:6px 0; border-radius:7px;
+  color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border:1.5px solid #2e1f0e;
+}
+.fgSecTab[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 65%); border-color:var(--brass-dark);}
+.fgSecTab.fgAdd{color:#b8946a;}
+.fgBars{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+.fgBar{
+  font-family:inherit; cursor:pointer; width:58px; height:52px; border-radius:7px;
+  background:linear-gradient(180deg,#f2e5bd,#e0cc98); border:1.5px solid #9a7a44; color:var(--ink);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+}
+.fgBar[aria-pressed="true"]{border-color:var(--brass-dark); box-shadow:0 0 0 2px var(--brass);}
+.fgBarN{font-size:9px; color:var(--ink-soft);}
+.fgBarC{font-size:15px; font-weight:700;}
+.fgBarBtns{display:flex; align-items:center; gap:8px; margin-bottom:6px;}
+.fgBarInfo{font-size:11.5px; color:var(--ink-soft); font-style:italic; margin-left:auto;}
+.fgPalette{display:flex; flex-wrap:wrap; gap:6px;}
+.fgChord{
+  font-family:inherit; font-size:13.5px; font-weight:700; cursor:pointer; min-width:44px; padding:8px 12px; border-radius:7px;
+  color:#3a2200; background:radial-gradient(circle at 50% 20%, #f2e5c0, #d8c088); border:1.5px solid #9a7a44;
+}
+.fgChord:active{transform:translateY(1px);}
+.fgChord.fgFifth{color:#efe3c0; background:linear-gradient(180deg,#5d452a,#43301a); border-color:#2e1f0e; font-size:11.5px; font-variant:small-caps;}
+.fgRole{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:7px 0; border-bottom:1px dashed rgba(120,85,40,.3);}
+.fgRole.off{opacity:.5;}
+.fgRoleTog{
+  font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; width:104px; flex:0 0 auto; text-align:left;
+  padding:7px 12px; border-radius:20px; color:#efe3c0;
+  background:linear-gradient(180deg,#5d452a,#43301a); border:1.5px solid #2e1f0e;
+}
+.fgRoleTog[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 65%, var(--brass-dark)); border-color:var(--brass-dark);}
+.fgInsts, .fgDens{display:flex; gap:4px;}
+.fgInstOpt, .fgDensOpt{
+  font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; padding:5px 9px; border-radius:6px;
+  color:#efe3c0; background:linear-gradient(180deg,#4a3620,#38260f); border:1px solid #2e1f0e;
+}
+.fgDensOpt{letter-spacing:1px;}
+.fgDens{margin-left:auto;}
+.fgInstOpt[aria-pressed="true"], .fgDensOpt[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 30%, var(--brass-lite), var(--brass) 70%); border-color:var(--brass-dark);}
+#viewForge input[type=text].fnText{flex:1;}

@@ -4,6 +4,8 @@ import {STYLES} from './styles.js';
 import {state, persist, MIX_DEFAULTS, bindPersist} from './state.js';
 import {clamp} from './util.js';
 import * as engine from './engine.js';
+import * as forge from './forge.js';
+import {unregisterSong} from './styles.js';
 
 const {conductor, ENERGY_TARGETS} = engine;
 bindPersist(() => conductor.intensityTarget);
@@ -19,13 +21,25 @@ function buildCards() {
   const wrap = $('#cards');
   wrap.textContent = '';
   for (const [id, sty] of Object.entries(STYLES)) {
+    if (id === '__draft') continue; /* the Forge's live draft is not a set-list tune */
     const meter = sty.stepsPerBeat === 6 ? (sty.beatsPerBar === 3 ? '9/8' : '6/8')
       : (sty.beatsPerBar === 3 ? '3/4' : sty.beatsPerBar === 2 ? '2/4' : '4/4');
     const b = document.createElement('button');
-    b.className = 'card'; b.dataset.id = id;
-    b.innerHTML = '<span class="ic">' + sty.icon + '</span><span class="nm">' + sty.name +
-      '</span><span class="mt">' + meter + ' · ' + MODES[sty.mode].label + ' · ' + sty.bpm + '</span>';
-    b.addEventListener('click', () => selectStyle(id));
+    b.className = 'card' + (sty._user ? ' custom' : ''); b.dataset.id = id;
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    b.innerHTML = '<span class="ic">' + sty.icon + '</span><span class="nm">' + esc(sty.name) +
+      '</span><span class="mt">' + meter + ' · ' + MODES[sty.mode].label + ' · ' + sty.bpm + '</span>' +
+      (sty._user ? '<span class="del" role="button" aria-label="Forget this tune" title="Forget this tune">✕</span>' : '');
+    b.addEventListener('click', e => {
+      if (e.target.classList.contains('del')) {
+        if (confirm('Forget “' + sty.name + '”?')) {
+          state.songs = state.songs.filter(s => s.id !== id);
+          unregisterSong(id); persist(); buildCards();
+        }
+        return;
+      }
+      selectStyle(id);
+    });
     wrap.appendChild(b);
   }
   for (const c of state.customs) {
@@ -403,6 +417,7 @@ function bindTransport() {
   engine.on('transport', ({playing, styleName}) => {
     $('#playBtn').classList.toggle('playing', playing);
     $('#playBtn').setAttribute('aria-label', playing ? 'Stop' : 'Play');
+    forge.forgeTransport(playing);
     raf.styleName = styleName || raf.styleName;
     if (playing) { $('#nowSub').textContent = styleName; }
     else { $('#chordNow').textContent = '—'; $('#nowSub').textContent = 'tap play to strike up the band'; }
@@ -443,16 +458,25 @@ function raf() {
 }
 export const rms = () => raf.smoothed || 0;
 
-function bindViews() {
-  const tabs = [['#tabPlay', '#viewPlay'], ['#tabSetup', '#viewSetup']];
-  for (const [tabSel, viewSel] of tabs) {
-    $(tabSel).addEventListener('click', () => {
-      for (const [t, v] of tabs) {
-        $(t).setAttribute('aria-selected', String(t === tabSel));
-        $(v).classList.toggle('active', v === viewSel);
-      }
-    });
+const VIEW_TABS = [['#tabPlay', '#viewPlay'], ['#tabSetup', '#viewSetup'], ['#tabForge', '#viewForge']];
+function switchViewTo(tabSel) {
+  for (const [t, v] of VIEW_TABS) {
+    $(t).setAttribute('aria-selected', String(t === tabSel));
+    $(v).classList.toggle('active', t === tabSel);
   }
+  if (tabSel === '#tabForge') forge.forgeOnShow();
+}
+function bindViews() {
+  for (const [tabSel] of VIEW_TABS) $(tabSel).addEventListener('click', () => switchViewTo(tabSel));
+  $('#fgAddBar').addEventListener('click', forge.forgeAddBar);
+  $('#fgDelBar').addEventListener('click', forge.forgeDelBar);
+  document.addEventListener('forge-saved', e => {
+    buildCards();
+    const id = e.detail.id;
+    switchViewTo('#tabPlay');
+    const card = document.querySelector('.card[data-id="' + id + '"]');
+    if (card) { card.click(); card.scrollIntoView({block: 'nearest'}); }
+  });
   $('#keepBtn').addEventListener('click', () => {
     const base = STYLES[state.pending.styleId ?? state.styleId];
     const name = prompt('Name this sound:', base.name + ' (mine)');
@@ -465,7 +489,7 @@ function bindViews() {
 
 export function init() {
   buildCards(); buildKeys(); buildMyKey(); buildChips(); buildVoices(); buildWorkshop();
-  bindPerformance(); bindTransport(); bindViews(); bindNotes();
+  bindPerformance(); bindTransport(); bindViews(); bindNotes(); forge.initForge();
   $('#tempo').value = state.tempoTarget; $('#bpmOut').textContent = state.tempoTarget;
   $('#vol').value = state.volume;
   $('#blendBtn').setAttribute('aria-pressed', String(state.blend));
