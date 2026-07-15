@@ -4,6 +4,9 @@ Fantasy tavern backing-track generator. Procedural Web Audio engine (sampled
 percussion + physical-modeling synthesis fallback) with a performance surface
 for playing along on tin whistle or harp.
 
+**Live:** https://simone-scheuer.github.io/pocketbard/ — deploy with `./deploy.sh`.
+Repo: https://github.com/Simone-Scheuer/pocketbard
+
 ## Development
 
 ```
