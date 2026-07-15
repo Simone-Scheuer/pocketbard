@@ -275,6 +275,42 @@ class HandDrum extends Instrument {
   }
 }
 
+/* bowed/bellows sustains (fiddle, accordion): sampled sustain through an
+   attack/release envelope; synth formant fallback when unsampled */
+class Bowed extends Instrument {
+  bow(t, midi, durSec, vel) {
+    this.ensureBus();
+    const a = this.def.attack ?? .2, rel = this.def.release ?? .35;
+    const g = AC.createGain();
+    const peak = vel * samples.noteGain(this.id);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + a);
+    g.gain.setTargetAtTime(0, t + Math.max(a, durSec - rel * .5), rel / 3);
+    g.connect(this.out);
+    const stopAt = t + durSec + rel * 3;
+    const sampled = samples.note(this.id, midi);
+    if (sampled) {
+      const src = AC.createBufferSource(); src.buffer = sampled.buffer;
+      src.playbackRate.value = sampled.rate * (1 + rand(-.002, .002));
+      src.connect(g); src.start(t); src.stop(stopAt);
+      return;
+    }
+    /* fallback: detuned saws -> violin-ish formant bandpasses */
+    const pre = AC.createGain(); pre.gain.value = .16;
+    for (const det of [-6, 5]) {
+      const o = AC.createOscillator(); o.type = 'sawtooth';
+      o.frequency.value = mtof(midi); o.detune.value = det;
+      o.connect(pre); o.start(t); o.stop(stopAt);
+    }
+    for (const [f, q, fg] of [[300, 3.5, .9], [700, 3.5, .7], [3000, 2, .3]]) {
+      const bp = AC.createBiquadFilter(); bp.type = 'bandpass';
+      bp.frequency.value = f; bp.Q.value = q;
+      const bg = AC.createGain(); bg.gain.value = fg;
+      pre.connect(bp); bp.connect(bg); bg.connect(g);
+    }
+  }
+}
+
 /* jingles/cymbal-ish metals: sampled when available, else a cluster of
    detuned high partials + breath noise */
 class Jingle extends Instrument {
@@ -360,6 +396,8 @@ function buildRoster() {
     ks: {bright: .22, damp: .9962, pick: .45, dur: 1.3, detune: 0, layers: 1},
     body: [{f: 95, q: 1, g: 2}],
     thock: {f: 170, q: 2, dur: .014, g: .3}});
+  new Bowed({id: 'fiddle', group: 'fiddle', pan: -.18, gain: .5, attack: .18, release: .4});
+  new Bowed({id: 'accordion', group: 'air', pan: .15, gain: .4, attack: .22, release: .3});
   new Instrument({id: 'drone', group: 'drone', pan: -.14, gain: .4});
   new Instrument({id: 'pad', group: 'air', pan: .1, gain: .07});
   new Instrument({id: 'hearth', group: 'hearth', pan: .3, gain: .5});
@@ -403,6 +441,21 @@ export const GENERATORS = {
         ev.push({step: s, off: .5, voice: hi ? 'fingerLo' : 'fingerHi', vel: rand(.09, .18)});
     }
     return ev;
+  }},
+  /* the croony voice: one long bowed tone per bar (chord root, the fifth
+     every 4th bar); a root+fifth double-stop during the hush */
+  bowedLine: {mode: 'bar', fn(ctx) {
+    const ev = [];
+    const off = (ctx.bar % 4 === 3) ? 7 : 0;
+    ev.push({step: 0, chordOff: off, durSteps: ctx.stepsPerBar, vel: .32});
+    if (ctx.passage === 'break')
+      ev.push({step: 0, off: .3, chordOff: off === 7 ? 0 : 7, durSteps: ctx.stepsPerBar, vel: .24});
+    return ev;
+  }},
+  /* the bellows: one wheezy chord swell per bar (root, fifth, octave) */
+  squeeze: {mode: 'bar', fn(ctx) {
+    return [0, 7, 12].map((o, i) =>
+      ({step: 0, off: i * .05, chordOff: o, durSteps: ctx.stepsPerBar, vel: .3 - i * .04}));
   }},
   /* the "tss": scarcity is the signifier — one per bar at most, every other
      bar in 6/8; opens up only on the last bar of each section */
@@ -504,15 +557,32 @@ export function setHearth(onNow) {
   }
 }
 
+/* ================= arrangement =================
+   The song arc: the band moves through passages, one audible change per
+   passage (a layer in, a layer out, or a handoff). After the composed tag
+   it starts the next pass — endless play, song-shaped. Role lists gate
+   which parts sound, on top of the user's toggles. */
+const ARC = [
+  {id: 'intro', sec: 'A', mBars: 4, label: 'intro',  roles: ['pluck', 'drone', 'pad']},
+  {id: 'A1',    sec: 'A', mBars: 8, label: 'verse',  roles: ['pluck', 'drone', 'pad', 'bass', 'drums']},
+  {id: 'A2',    sec: 'A', mBars: 8, label: 'rise',   roles: ['pluck', 'drone', 'pad', 'bass', 'drums', 'texture', 'bowed']},
+  {id: 'B1',    sec: 'B', mBars: 8, label: 'turn',   roles: ['pluck', 'drone', 'pad', 'bass', 'drums', 'texture', 'bowed', 'tss', 'jingle', 'squeeze']},
+  {id: 'A3',    sec: 'A', mBars: 8, label: 'peak',   roles: 'all'},
+  {id: 'break', sec: 'B', mBars: 4, label: 'hush',   roles: ['drone', 'pad', 'bowed', 'squeeze']},
+  {id: 'final', sec: 'B', mBars: 8, label: 'finale', roles: 'all'},
+  {id: 'tag',   sec: 'A', mBars: 0, label: 'tag',    roles: ['drums', 'pluck', 'bass', 'drone'], tag: true},
+];
+function passageLen(pass, sty) {
+  /* two-beat bars (jigs, polka) are short — double their passages */
+  return pass.tag ? 2 : pass.mBars * (sty.beatsPerBar === 2 ? 2 : 1);
+}
+function roleActive(pass, pname) {
+  return pass.roles === 'all' || pass.roles.includes(pname);
+}
+
 /* ================= sequencer ================= */
 let timer = null;
-export const beatQueue = [], chordQueue = [];
-function barList(sty) {
-  return sty.form.split('').flatMap(L => {
-    const sec = sty.sections[L];
-    return sec.map((spec, i) => ({spec, fill: i === sec.length - 1}));
-  });
-}
+export const beatQueue = [], chordQueue = [], passageQueue = [];
 function pickPattern(variants) {
   const tot = variants.reduce((s, v) => s + v.w, 0);
   let r = Math.random() * tot;
@@ -521,6 +591,8 @@ function pickPattern(variants) {
 }
 function partOn(pname, part) {
   const t = state.toggles;
+  if (pname === 'bowed') return t.fiddle;
+  if (pname === 'squeeze') return t.pad;
   if (part.kind === 'drum' || pname === 'texture') return t.drums;
   if (part.kind === 'jingle' || pname === 'tss') return t.jingle;
   if (part.kind === 'harmony') return t.pluck;
@@ -536,20 +608,33 @@ function beginBar(when) {
       applyReverb(when);
     }
     if (st.pending.tonic !== undefined) st.tonic = st.pending.tonic;
-    st.pending = {}; st.lastDrone = null;
+    st.pending = {}; st.lastDrone = null; st.arc = null; /* new tune, fresh arc */
   }
   const sty = STYLES[st.styleId];
-  st._pluckPreset = sty.parts.pluck ? sty.parts.pluck.inst : 'lute';
   const stepsPerBar = sty.beatsPerBar * sty.stepsPerBeat;
-  const bars = barList(sty);
-  const cur = bars[st.barIdx % bars.length];
-  const nxt = bars[(st.barIdx + 1) % bars.length];
-  const chord = makeChord(st.tonic, sty.mode, cur.spec);
-  const next = makeChord(st.tonic, sty.mode, nxt.spec);
+  /* advance the song arc */
+  if (!st.arc) { st.arc = {p: 0, bar: 0}; passageQueue.push({t: when, label: ARC[0].label}); }
+  let pass = ARC[st.arc.p];
+  if (st.arc.bar >= passageLen(pass, sty)) {
+    st.arc.p = (st.arc.p + 1) % ARC.length;
+    st.arc.bar = 0;
+    pass = ARC[st.arc.p];
+    passageQueue.push({t: when, label: pass.label});
+  }
+  const barInPass = st.arc.bar;
+  st.arc.bar++;
+  const plen = passageLen(pass, sty);
+  const secChords = sty.sections[pass.sec] || sty.sections.A;
+  const spec = pass.tag ? secChords[0] : secChords[barInPass % secChords.length];
+  const nextSpec = pass.tag ? secChords[0] : secChords[(barInPass + 1) % secChords.length];
+  const chord = makeChord(st.tonic, sty.mode, spec);
+  const next = makeChord(st.tonic, sty.mode, nextSpec);
+  const isFill = !pass.tag && (barInPass % secChords.length === secChords.length - 1);
+  const isTransition = barInPass === plen - 1;
   const band = conductor.band();
-  /* the band picks its groove once per 4-bar section and rides it —
+  /* the band picks its groove once per passage-quarter and rides it —
      repetition is the accompanist's job; the flute owns the variation */
-  const secKey = st.styleId + ':' + band + ':' + Math.floor(st.barIdx / 4);
+  const secKey = st.styleId + ':' + band + ':' + st.arc.p + ':' + Math.floor(barInPass / 4);
   if (st._secKey !== secKey) {
     st._secKey = secKey;
     st._secPats = {};
@@ -579,33 +664,44 @@ function beginBar(when) {
     }
   }
   const pats = {}, gens = {};
-  for (const [pname, part] of Object.entries(sty.parts)) {
-    if (part.kind === 'gen' || !partOn(pname, part)) continue;
-    let s = st._secPats[pname];
-    if (!s) continue;
-    const fp = (part.kind === 'drum' ? .7 : .5) * st.mix.fills * lerp(.75, 1, conductor.intensity);
-    if (cur.fill && part.fills && Math.random() < Math.min(.95, fp)) s = choice(part.fills);
-    pats[pname] = s;
+  if (pass.tag) {
+    /* the composed ending: one unison stab, then a bar of ring-out */
+    if (barInPass === 0) {
+      const dots = '.'.repeat(stepsPerBar - 1);
+      if (sty.parts.drums && partOn('drums', sty.parts.drums)) pats.drums = 'D' + dots;
+      if (sty.parts.pluck && partOn('pluck', sty.parts.pluck)) pats.pluck = 'C' + dots;
+      if (sty.parts.bass && partOn('bass', sty.parts.bass)) pats.bass = 'R' + dots;
+    }
+  } else {
+    for (const [pname, part] of Object.entries(sty.parts)) {
+      if (part.kind === 'gen' || !partOn(pname, part) || !roleActive(pass, pname)) continue;
+      let s = st._secPats[pname];
+      if (!s) continue;
+      const fp = (part.kind === 'drum' ? .7 : .5) * st.mix.fills *
+        lerp(.75, 1, conductor.intensity) * (isTransition ? 1.5 : .8);
+      if (isFill && part.fills && Math.random() < Math.min(.95, fp)) s = choice(part.fills);
+      pats[pname] = s;
+    }
+    const ctx = Object.assign({}, st._secCtx, {bar: st.barIdx, isFill, passage: pass.id});
+    for (const [pname, part] of Object.entries(sty.parts)) {
+      if (part.kind !== 'gen' || !partOn(pname, part) || !roleActive(pass, pname)) continue;
+      const g = GENERATORS[part.gen];
+      if (g.mode === 'section') { gens[pname] = st._secGens[pname] || {}; continue; }
+      const byStep = {};
+      for (const e of g.fn(ctx, part)) (byStep[e.step] ??= []).push(e);
+      gens[pname] = byStep;
+    }
   }
-  const ctx = Object.assign({}, st._secCtx, {bar: st.barIdx, isFill: cur.fill});
-  for (const [pname, part] of Object.entries(sty.parts)) {
-    if (part.kind !== 'gen' || !partOn(pname, part)) continue;
-    const g = GENERATORS[part.gen];
-    if (g.mode === 'section') { gens[pname] = st._secGens[pname] || {}; continue; }
-    const byStep = {};
-    for (const e of g.fn(ctx, part)) (byStep[e.step] ??= []).push(e);
-    gens[pname] = byStep;
-  }
-  st.curBar = {chord, next, pats, gens, sty};
+  st.curBar = {chord, next, pats, gens, sty, pass};
   /* drone follows the tonic, not the chord */
   const droneKey = st.tonic + ':' + st.styleId;
-  const droneOn = state.toggles.drone && sty.drone > 0;
+  const droneOn = state.toggles.drone && sty.drone > 0 && roleActive(pass, 'drone');
   if (droneOn && st.lastDrone !== droneKey) {
     const tonicChord = makeChord(st.tonic, sty.mode, {d: 0, q: '5'});
     startDrone(tonicChord.bass, sty.drone, when);
     st.lastDrone = droneKey;
   } else if (!droneOn && st.lastDrone) { stopDrone(when); st.lastDrone = null; }
-  if (state.toggles.pad && sty.pad > 0) {
+  if (state.toggles.pad && sty.pad > 0 && roleActive(pass, 'pad')) {
     if (st.lastChordKey !== chord.key) { padChord(chord, sty.pad, when); st.lastChordKey = chord.key; }
   } else if (st.lastChordKey) { padChord(chord, 0, when); st.lastChordKey = null; }
   chordQueue.push({t: when, label: chord.label});
@@ -675,7 +771,7 @@ function scheduleStep(when) {
     const ch = pat[st.stepInBar];
     if (!ch || ch === '.') continue;
     const part = sty.parts[pname];
-    const t = when + sw + rand(-1, 1) * (JITTER[part.kind] || .004) * st.mix.human;
+    const t = when + sw + rand(-1, 1) * (JITTER[part.kind] || .004) * st.mix.human * (sty.rough || 1);
     dispatchChar(part, ch, Math.max(t, AC.currentTime + .005), bar);
   }
   for (const [pname, byStep] of Object.entries(bar.gens)) {
@@ -684,9 +780,13 @@ function scheduleStep(when) {
     const part = sty.parts[pname];
     const inst = INSTRUMENTS[part.inst];
     for (const e of evs) {
-      let t = when + sw + (e.off || 0) * st.stepDur + rand(-1, 1) * JITTER.gen * st.mix.human;
+      let t = when + sw + (e.off || 0) * st.stepDur + rand(-1, 1) * JITTER.gen * st.mix.human * (sty.rough || 1);
       t = Math.max(t, AC.currentTime + .005);
       if (inst instanceof HandDrum) inst.stroke(t, e.voice, e.vel * hum());
+      else if (inst instanceof Bowed) {
+        const midi = bar.chord.rootMidi + (e.chordOff || 0) + (part.octave || 0);
+        inst.bow(t, midi, e.durSteps * st.stepDur, e.vel * hum());
+      }
       else if (inst instanceof Jingle) inst.hit(t, e.vel * hum(), {open: e.open});
     }
   }
@@ -719,6 +819,8 @@ export function play() {
   initAudio(); AC.resume();
   const st = state;
   st.playing = true; st.stepInBar = 0; st.barIdx = 0; st.lastChordKey = null; st.lastDrone = null;
+  st.arc = null; st._secKey = null;
+  passageQueue.length = 0;
   st.tempo = st.tempoTarget;
   st.nextTime = AC.currentTime + .1;
   applyReverb();
@@ -732,7 +834,7 @@ export function stop() {
   clearInterval(timer); timer = null;
   stopDrone(); if (padNodes) { padChord({rootMidi: 0}, 0, AC.currentTime); } st.lastChordKey = null; st.lastDrone = null;
   if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
-  beatQueue.length = 0; chordQueue.length = 0;
+  beatQueue.length = 0; chordQueue.length = 0; passageQueue.length = 0;
   emit('transport', {playing: false});
 }
 export function togglePlay() { state.playing ? stop() : play(); }

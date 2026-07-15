@@ -17,3 +17,5 @@ Folders:
 Additional sources (also CC0 1.0):
 - lute/    FreePats "Spanish Classical Guitar" (freepats.zenvoid.org)
 - harp/    FreePats "Concert Harp" (assembled from VCSL samples)
+- fiddle/    VSCO-2-CE "Solo Violin, Arco Vib" (CC0 1.0)
+- accordion/ FreePats "Button Accordion HN" (CC0 1.0)

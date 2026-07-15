@@ -106,7 +106,7 @@ function buildKeys() {
   });
 }
 const CHIPS = [['drums','🥁 Drum'],['jingle','🔔 Jingle'],['pluck','🪕 Strings'],
-  ['bass','𝄢 Bass'],['drone','🐝 Drone'],['pad','🌬️ Air'],['hearth','🔥 Hearth']];
+  ['fiddle','🎻 Fiddle'],['bass','𝄢 Bass'],['drone','🐝 Drone'],['pad','🌬️ Air'],['hearth','🔥 Hearth']];
 function buildChips() {
   const wrap = $('#chips');
   for (const [k, label] of CHIPS) {
@@ -128,8 +128,9 @@ function refreshChipAvail() {
     const k = b.dataset.k;
     let has = true;
     if (k === 'jingle') has = !!Object.values(sty.parts).some(p => p.kind === 'jingle' || p.gen === 'backbeatTss');
+    else if (k === 'fiddle') has = !!Object.values(sty.parts).some(p => p.inst === 'fiddle');
     else if (k === 'drone') has = sty.drone > 0;
-    else if (k === 'pad') has = sty.pad > 0;
+    else if (k === 'pad') has = sty.pad > 0 || Object.values(sty.parts).some(p => p.inst === 'accordion');
     else if (k === 'drums') has = !!Object.values(sty.parts).some(p => p.kind === 'drum');
     else if (k === 'pluck') has = !!Object.values(sty.parts).some(p => p.kind === 'harmony');
     else if (k === 'bass') has = !!Object.values(sty.parts).some(p => p.kind === 'bass');
@@ -306,6 +307,7 @@ const WS_GROUPS = [
     ['drums', 'Drums', 0, 150, 1],
     ['jingle', 'Jingles', 0, 150, 1],
     ['strings', 'Strings', 0, 150, 1],
+    ['fiddle', 'Fiddle', 0, 150, 1],
     ['bass', 'Bass', 0, 150, 1],
     ['drone', 'Drone', 0, 150, 1],
     ['air', 'Air', 0, 150, 1],
@@ -396,6 +398,7 @@ function bindTransport() {
   engine.on('transport', ({playing, styleName}) => {
     $('#playBtn').classList.toggle('playing', playing);
     $('#playBtn').setAttribute('aria-label', playing ? 'Stop' : 'Play');
+    raf.styleName = styleName || raf.styleName;
     if (playing) { $('#nowSub').textContent = styleName; }
     else { $('#chordNow').textContent = '—'; $('#nowSub').textContent = 'tap play to strike up the band'; }
   });
@@ -412,6 +415,14 @@ function raf() {
   }
   while (engine.chordQueue.length && engine.chordQueue[0].t <= now) {
     chordNow.textContent = engine.chordQueue.shift().label;
+  }
+  while (engine.passageQueue.length && engine.passageQueue[0].t <= now) {
+    const p = engine.passageQueue.shift();
+    if (state.playing) {
+      const custom = state._customSel ? state.customs.find(c => c.id === state._customSel) : null;
+      const name = custom ? custom.name : STYLES[state.styleId].name;
+      $('#nowSub').textContent = name + ' · ' + p.label;
+    }
   }
   const analyser = engine.getAnalyser();
   if (analyser) {

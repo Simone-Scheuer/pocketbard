@@ -2,14 +2,14 @@ import {clamp} from './util.js';
 import {STYLES} from './styles.js';
 
 export const MIX_DEFAULTS = {
-  drums: 1, jingle: 1, strings: 1, bass: 1, drone: 1, air: 1, texture: 1,
+  drums: 1, jingle: 1, strings: 1, fiddle: 1, bass: 1, drone: 1, air: 1, texture: 1,
   reverb: 1, warmth: 760, swing: 1, fills: 1, human: 1,
 };
 
 export const state = {
   playing: false, styleId: 'tavern_jig', tonic: 2, energy: 1,
   tempo: 108, tempoTarget: 108, volume: .8,
-  toggles: {drums: true, jingle: true, pluck: true, bass: true, drone: true, pad: true, hearth: false},
+  toggles: {drums: true, jingle: true, pluck: true, fiddle: true, bass: true, drone: true, pad: true, hearth: false},
   voices: {strings: null, drums: null}, /* null = the tune's own pick */
   myKey: null, /* player's instrument key (pc); tunes re-tonic to fit it */
   blend: false, /* true = slow crossfades on key/tune changes; false = tight */

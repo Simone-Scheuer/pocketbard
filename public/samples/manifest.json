@@ -127,6 +127,58 @@
     "harp/G5_f1.m4a",
     "harp/G5_mf1.m4a"
    ]
+  },
+  "fiddle": {
+   "55": [
+    "fiddle/G3.m4a"
+   ],
+   "57": [
+    "fiddle/A3.m4a"
+   ],
+   "60": [
+    "fiddle/C4.m4a"
+   ],
+   "64": [
+    "fiddle/E4.m4a"
+   ],
+   "67": [
+    "fiddle/G4.m4a"
+   ],
+   "69": [
+    "fiddle/A4.m4a"
+   ],
+   "72": [
+    "fiddle/C5.m4a"
+   ],
+   "76": [
+    "fiddle/E5.m4a"
+   ],
+   "79": [
+    "fiddle/G5.m4a"
+   ]
+  },
+  "accordion": {
+   "47": [
+    "accordion/B3.m4a"
+   ],
+   "50": [
+    "accordion/D4.m4a"
+   ],
+   "54": [
+    "accordion/Fs4.m4a"
+   ],
+   "57": [
+    "accordion/A4.m4a"
+   ],
+   "60": [
+    "accordion/C5.m4a"
+   ],
+   "64": [
+    "accordion/E5.m4a"
+   ],
+   "67": [
+    "accordion/G5.m4a"
+   ]
   }
  },
  "gains": {
@@ -143,6 +195,8 @@
   "bongos.fingerLo": 0.55,
   "bongos.fingerHi": 0.5,
   "lute.notes": 0.72,
-  "harp.notes": 0.68
+  "harp.notes": 0.68,
+  "fiddle.notes": 0.5,
+  "accordion.notes": 0.45
  }
 }

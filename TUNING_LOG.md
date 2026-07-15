@@ -2,26 +2,28 @@
 
 ## Open backlog (from Simone's 2026-07-15 listening pass — fix in batches, not piecemeal)
 
-- **A · Arrangement arcs**: "none of ours are actual songs, they're just 2-8 bars
-  repeating" (ref: David Arkenstone "Blood Sail" — layers, adventure build).
-  Biggest open musical item. Needs an arrangement/form layer over the section
-  engine (intros, layer entrances, lifts) — but conductor-driven, Simone stays
-  the arranger.
-- **T · Bowed "croony drone" voice**: sustained fiddle-ish melody-adjacent
-  texture (NOT hurdy-gurdy literally), for the sad tunes (Willow, Grove).
-  New instrument in the roster.
 - **V · Understated mode**: ref Justin Bell "The Fox and the Farmer" (PoE) —
-  "a jingle and a tap in the background", maximal space for the flute. Maybe
-  Calm should be this by default; or an "Understated" arrangement flavor.
-- **G/T · Shanty isn't piratey**: research DONE — swung 6/8 + hemiola,
-  accordion bed (CC0 source verified), halyard one-pull-per-bar + gang answer,
-  roughness. See research addendum.
-- **G · Kerry Polka isn't diddly enough**: research DONE — boom-chick voicing,
-  no thirds, double-tonic, phrase-aware bar-8 lift, one bodhrán pattern.
-- **T · Bowed voice sources verified**: VSCO solo violin/viola/cello sustains
-  (CC0), synth formant fallback recipe in research addendum.
-- **A · Arrangement grammar defined**: section state machine INTRO→A→A+→B→
-  A3→BREAKDOWN→FINAL→TAG, one change per 8 bars, composed tag.
+  "a jingle and a tap in the background". Partially served by the new arc's
+  intro/verse passages; a dedicated Understated flavor still open.
+
+## The Batch (2026-07-15, all four items shipped)
+
+- 2026-07-15 · A · ARRANGEMENT ENGINE: song-arc state machine (intro→verse→
+  rise→turn→peak→hush→finale→tag, ~one change per passage, composed 2-bar tag,
+  endless song-shaped cycling; passage label shown in transport) · "none of
+  ours are actual songs"
+- 2026-07-15 · T · FIDDLE: new Bowed instrument class, VSCO solo violin
+  sustains (9 notes, pitch-verified), formant-synth fallback; bowedLine
+  generator (root long tones, fifth every 4th bar, double-stop in hush);
+  added to shanty/reel/slip/grove/willow; new chip + Fiddle level slider ·
+  "droning croony melody instrument"
+- 2026-07-15 · G/T · SHANTY PIRATE REWORK: 4/4→swung 6/8 with lilt, halyard
+  one-pull-per-bar + gang clap answer, ACCORDION bellows bed (FreePats CC0,
+  octave-verified), fiddle croon, hemiola fills, rough=1.6 timing scatter,
+  i-bVII double-tonic + iv/bVI/v B-section · "doesn't sound like a pirate song"
+- 2026-07-15 · G · CÉILÍ DANCE (was Kerry Polka): all chords open fifths
+  (no thirds/DADGAD ambiguity), ONE bodhrán pattern (down-up down down),
+  132 BPM · "not diddly enough / more Gaelic"
 
 ## Reference deck (growing)
 
