@@ -527,9 +527,12 @@ export const GENERATORS = {
       if (s.deg < -3) s.deg = -3 + (-3 - s.deg);
       s.deg = clamp(s.deg, -4, 8);
       const vel = (strong ? .72 : .5) * (.85 + Math.random() * .3);
-      /* grace-note ornament: a quick step above, just before a strong note */
-      if (strong && !resolving && Math.random() < .16)
-        ev.push({step, off: -.4, midi: midi(s.deg + 1), vel: vel * .5});
+      /* grace-note ornament: a rare quick step above, just before a strong
+         note — a occasional flourish, not a constant tic */
+      if (strong && !resolving && !s.gracedLast && Math.random() < .05) {
+        ev.push({step, off: -.38, midi: midi(s.deg + 1), vel: vel * .45});
+        s.gracedLast = true;
+      } else s.gracedLast = false;
       ev.push({step, midi: midi(s.deg), vel});
     }
     s.phraseBar = (s.phraseBar + 1) % 4;

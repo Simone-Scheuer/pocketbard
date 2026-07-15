@@ -13,6 +13,8 @@
 
 ## THE FORGE — song maker (2026-07-15)
 
+- 2026-07-15 · T · melody grace-note ornaments cut ~16%%->5%% per strong beat + no-two-in-a-row guard · "double-stops way too much, sounds odd"
+
 - 2026-07-15 · FEATURE · The Forge: third tab to build your own tunes.
   Foundation (meter/mode/key/tempo/drone) + Chords (multi-section, tap-to-place
   in-key palette + open-fifth) + Band (8 roles -> instrument -> density). Saves
