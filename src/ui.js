@@ -146,6 +146,10 @@ function refreshKeyUI() {
     el.textContent = NOTE_NAMES[tonic] + ' ' + MODES[sty.mode].label;
   for (const el of document.querySelectorAll('.whistleHintEl'))
     el.textContent = whistleHint(tonic, sty.mode);
+  const note = $('#autoKeyNote');
+  if (note) note.textContent = state.myKey != null
+    ? 'Auto-keying for your ' + NOTE_NAMES[state.myKey] + ' instrument. A key you tap above sticks until you pick another tune.'
+    : 'Set your whistle or harp’s key and every tune you pick will re-key itself to fit it.';
 }
 function selectStyle(id) {
   state._customSel = null;
@@ -295,20 +299,27 @@ function bindPerformance() {
 }
 
 /* ---------- workshop ---------- */
-const WS_DEFS = [
-  ['drums', 'Drums', 0, 150, 1],
-  ['texture', 'Pitter-patter', 0, 150, 1],
-  ['jingle', 'Jingles', 0, 150, 1],
-  ['strings', 'Strings', 0, 150, 1],
-  ['bass', 'Bass', 0, 150, 1],
-  ['drone', 'Drone', 0, 150, 1],
-  ['air', 'Air', 0, 150, 1],
-  ['reverb', 'Reverb', 0, 150, 1],
-  ['warmth', 'Bass tone', 300, 2400, 10],
-  ['swing', 'Swing', 0, 150, 1],
-  ['fills', 'Fills', 0, 150, 1],
-  ['human', 'Looseness', 0, 200, 1],
+/* two families on purpose: Levels are how LOUD each part is; Feel is how
+   the band BEHAVES (density, space, timbre, timing) */
+const WS_GROUPS = [
+  ['How loud', [
+    ['drums', 'Drums', 0, 150, 1],
+    ['jingle', 'Jingles', 0, 150, 1],
+    ['strings', 'Strings', 0, 150, 1],
+    ['bass', 'Bass', 0, 150, 1],
+    ['drone', 'Drone', 0, 150, 1],
+    ['air', 'Air', 0, 150, 1],
+  ]],
+  ['How they play', [
+    ['texture', 'Pitter-patter', 0, 150, 1],
+    ['fills', 'Fills', 0, 150, 1],
+    ['swing', 'Swing', 0, 150, 1],
+    ['human', 'Looseness', 0, 200, 1],
+    ['warmth', 'Bass tone', 300, 2400, 10],
+    ['reverb', 'Room', 0, 150, 1],
+  ]],
 ];
+const WS_DEFS = WS_GROUPS.flatMap(([, defs]) => defs);
 const wsValue = key => key === 'warmth' ? state.mix.warmth : Math.round(state.mix[key] * 100);
 const wsLabel = key => key === 'warmth' ? state.mix.warmth + ' Hz' : Math.round(state.mix[key] * 100) + '%';
 function wsSyncJson() { $('#wsJson').value = JSON.stringify(state.mix); }
@@ -322,19 +333,24 @@ function wsSyncInputs() {
 }
 function buildWorkshop() {
   const wrap = $('#wsRows');
-  for (const [key, label, min, max, step] of WS_DEFS) {
-    const row = document.createElement('div');
-    row.className = 'wsRow'; row.dataset.k = key;
-    row.innerHTML = '<label for="ws_' + key + '">' + label + '</label>' +
-      '<input id="ws_' + key + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + wsValue(key) + '">' +
-      '<span class="wsVal">' + wsLabel(key) + '</span>';
-    row.querySelector('input').addEventListener('input', e => {
-      const v = +e.target.value;
-      state.mix[key] = key === 'warmth' ? v : v / 100;
-      row.querySelector('.wsVal').textContent = wsLabel(key);
-      engine.applyMix(); persist(); wsSyncJson();
-    });
-    wrap.appendChild(row);
+  for (const [groupName, defs] of WS_GROUPS) {
+    const h = document.createElement('h3');
+    h.className = 'wsGroup'; h.textContent = groupName;
+    wrap.appendChild(h);
+    for (const [key, label, min, max, step] of defs) {
+      const row = document.createElement('div');
+      row.className = 'wsRow'; row.dataset.k = key;
+      row.innerHTML = '<label for="ws_' + key + '">' + label + '</label>' +
+        '<input id="ws_' + key + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + wsValue(key) + '">' +
+        '<span class="wsVal">' + wsLabel(key) + '</span>';
+      row.querySelector('input').addEventListener('input', e => {
+        const v = +e.target.value;
+        state.mix[key] = key === 'warmth' ? v : v / 100;
+        row.querySelector('.wsVal').textContent = wsLabel(key);
+        engine.applyMix(); persist(); wsSyncJson();
+      });
+      wrap.appendChild(row);
+    }
   }
   $('#wsReset').addEventListener('click', () => {
     state.mix = Object.assign({}, MIX_DEFAULTS);
