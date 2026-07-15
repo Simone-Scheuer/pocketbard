@@ -6,6 +6,16 @@
   "a jingle and a tap in the background". Partially served by the new arc's
   intro/verse passages; a dedicated Understated flavor still open.
 
+## The Walking Set (2026-07-15)
+
+- 2026-07-15 · V/A · THREE SIMPLE PRESETS to play over forever, at top of set
+  list. Sparse: plucked + bowed fiddle + soft bodhrán over a tonic drone.
+  Real trad 4-chord journeys per section:
+  - Rambler's Road (D Dorian 6/8): Dm-G-C-Dm / F-C-G-Dm (major-IV Dorian)
+  - Sunny Mile (G Major 4/4): G-C-D-G / Em-D-C-G (descending walk home)
+  - Quiet Hollow (E Dorian 4/4 slow): Em-D-Em-A / G-A-D-Em (contemplative)
+  · "simple reliable presets to turn on and walk forever, make them sound good"
+
 ## The Batch (2026-07-15, all four items shipped)
 
 - 2026-07-15 · G · SHANTY DRIVING DRUMS: replaced halyard patterns with an

@@ -10,6 +10,84 @@ export const DRUM_MAPS = {
 };
 
 export const STYLES = {
+  /* ---- The Walking Set: simple, spacious, drone-anchored tunes built to
+     play over forever. Three voices (plucked + bowed fiddle + soft bodhrán)
+     over a tonic drone, with a real 4-chord journey in each section. ---- */
+  ramblers_road: {
+    /* D Dorian — i-IV-bVII-i out, bIII-bVII-IV-i home. The major IV (G) is
+       the Dorian magic; drone on D keeps the whistle grounded. */
+    name: 'Rambler’s Road', icon: '🥾', mode: 'dorian', tonic: 2, bpm: 104,
+    beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .06, reverb: .18, drone: .42, pad: 0,
+    sections: {A: [{d:0,q:'m'},{d:3,q:'M'},{d:6,q:'M'},{d:0,q:'m'}],
+               B: [{d:2,q:'M'},{d:6,q:'M'},{d:3,q:'M'},{d:0,q:'m'}]},
+    form: 'AABB',
+    parts: {
+      drums: {kind:'drum', map:'celtic',
+        pat: {calm: [{s:'D.....d.....',w:2},{s:'D...........',w:1}],
+              lively: [{s:'D.....D..t..',w:2},{s:'D.t...D.....',w:1},{s:'D.....d..t..',w:1}],
+              rowdy: [{s:'D.t...D..t..',w:2},{s:'D.t.t.D.....',w:1}]},
+        fills: ['D.....d.t.t.']},
+      pluck: {kind:'harmony', inst:'harp',
+        pat: {calm: [{s:'0...2...4...',w:2},{s:'0.......2...',w:1}],
+              lively: [{s:'0..1..2..4..',w:2},{s:'0.2.4.2.1.0.',w:2},{s:'0...2.4.2...',w:1}],
+              rowdy: [{s:'0.1.2.4.2.1.',w:2},{s:'0.2.4.3.4.2.',w:1}]},
+        fills: ['0.1.2.4.5.4.']},
+      bowed: {kind:'gen', inst:'fiddle', gen:'bowedLine', octave:12},
+      bass: {kind:'bass', inst:'bassViol',
+        pat: {calm: [{s:'R...........',w:1}],
+              lively: [{s:'R.....5.....',w:2},{s:'R...........',w:1}],
+              rowdy: [{s:'R.....5...R.',w:1},{s:'R.....5.....',w:1}]}},
+    }},
+  sunny_mile: {
+    /* G Major — I-IV-V-I out, then a descending vi-V-IV-I walk home. Warm,
+       sunlit, hymn-simple; lute strums gently, fiddle sings underneath. */
+    name: 'Sunny Mile', icon: '☀️', mode: 'major', tonic: 7, bpm: 100,
+    beatsPerBar: 4, stepsPerBeat: 4, swing: .08, reverb: .18, drone: .3, pad: 0,
+    sections: {A: [{d:0,q:'M'},{d:3,q:'M'},{d:4,q:'M'},{d:0,q:'M'}],
+               B: [{d:5,q:'m'},{d:4,q:'M'},{d:3,q:'M'},{d:0,q:'M'}]},
+    form: 'AABB',
+    parts: {
+      drums: {kind:'drum', map:'celtic',
+        pat: {calm: [{s:'D.......D.......',w:2},{s:'D...............',w:1}],
+              lively: [{s:'D.......D...t...',w:2},{s:'D...t...D.......',w:1}],
+              rowdy: [{s:'D...t...D...t...',w:2},{s:'D...t...D.t.t...',w:1}]},
+        fills: ['D.......D...t.t.']},
+      pluck: {kind:'harmony', inst:'lute',
+        pat: {calm: [{s:'C.......C.......',w:2},{s:'C...............',w:1}],
+              lively: [{s:'C...c...C...c...',w:2},{s:'C.......C...c...',w:1},{s:'C...c.u.C...c...',w:1}],
+              rowdy: [{s:'C...c.u.C...c.u.',w:2},{s:'C.1.2.3.C...c...',w:1}]},
+        fills: ['C...c...1.2.3.4.']},
+      bowed: {kind:'gen', inst:'fiddle', gen:'bowedLine', octave:12},
+      bass: {kind:'bass', inst:'bassViol',
+        pat: {calm: [{s:'R...............',w:1}],
+              lively: [{s:'R.......5.......',w:2},{s:'R.......5.....P.',w:1}],
+              rowdy: [{s:'R...R...5.......',w:1},{s:'R.......5.....P.',w:1}]}},
+    }},
+  quiet_hollow: {
+    /* E Dorian, slow — i-bVII-i-IV rocking, bIII-IV-bVII-i lift. Spacious and
+       contemplative; big drone, fiddle croon forward, a whisper of drum. */
+    name: 'Quiet Hollow', icon: '🌙', mode: 'dorian', tonic: 4, bpm: 80,
+    beatsPerBar: 4, stepsPerBeat: 4, swing: 0, reverb: .3, drone: .5, pad: .05,
+    sections: {A: [{d:0,q:'m'},{d:6,q:'M'},{d:0,q:'m'},{d:3,q:'M'}],
+               B: [{d:2,q:'M'},{d:3,q:'M'},{d:6,q:'M'},{d:0,q:'m'}]},
+    form: 'AABB',
+    parts: {
+      drums: {kind:'drum', map:'celtic',
+        pat: {calm: [{s:'D...............',w:2},{s:'................',w:1}],
+              lively: [{s:'D.......d.......',w:2},{s:'D...............',w:1}],
+              rowdy: [{s:'D.......D.......',w:1},{s:'D...t...d.......',w:1}]},
+        fills: ['D.......d...t...']},
+      pluck: {kind:'harmony', inst:'harp',
+        pat: {calm: [{s:'0.......4.......',w:2},{s:'0...............',w:1}],
+              lively: [{s:'0...2...4...2...',w:2},{s:'0.......4...2...',w:1}],
+              rowdy: [{s:'0.1.2.3.4...2...',w:1},{s:'0...2...4.3.2...',w:1}]},
+        fills: ['4...3...2...0...']},
+      bowed: {kind:'gen', inst:'fiddle', gen:'bowedLine', octave:12},
+      bass: {kind:'bass', inst:'bassViol',
+        pat: {calm: [{s:'R...............',w:1}],
+              lively: [{s:'R.......5.......',w:1}],
+              rowdy: [{s:'R.......5.......',w:1}]}},
+    }},
   tavern_jig: {
     name: 'Tavern Jig', icon: '🍺', mode: 'dorian', tonic: 2, bpm: 108,
     beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .07, reverb: .14, drone: .4, pad: 0,
