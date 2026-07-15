@@ -8,6 +8,8 @@
 
 ## The Batch (2026-07-15, all four items shipped)
 
+- 2026-07-15 · G · SHANTY DRIVING DRUMS: replaced halyard patterns with an
+  even rowing stroke (D..d..D..d.., dun-dun-dun-dun) · "simpler, more driving"
 - 2026-07-15 · G/A · SHANTY PROGRESSION + NO STRINGS: Simone A/B-tested pluck
   off and it won — part removed, accordion is the harmonic bed (intro passage
   now admits squeeze). Progression made intentional: aeolian, verse i-i-bVII-i,

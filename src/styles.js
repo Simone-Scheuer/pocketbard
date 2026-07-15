@@ -159,10 +159,11 @@ export const STYLES = {
     form: 'AABB',
     parts: {
       drums: {kind:'drum', map:'shanty',
-        pat: {calm: [{s:'S...........',w:2},{s:'S.....d.....',w:1}],
-              lively: [{s:'S.....D.t.t.',w:2},{s:'S.t.t.D.....',w:1},{s:'S.....D..t..',w:1}],
-              rowdy: [{s:'S.t.t.D.t.t.',w:2},{s:'S..S..D.t.t.',w:1}]},
-        fills: ['S.d.S.d.S.d.','D.d.D.d.D.d.']},
+        /* the rowing stroke: dun dun dun dun, relentless and even */
+        pat: {calm: [{s:'S.....d.....',w:2},{s:'S...........',w:1}],
+              lively: [{s:'D..d..D..d..',w:3},{s:'S..d..D..d..',w:1}],
+              rowdy: [{s:'D..d..D..d..',w:2},{s:'D..D..D..D..',w:1}]},
+        fills: ['D.d.D.d.D.d.','D..d..D.dd..']},
       claps: {kind:'drum', map:'shanty',
         pat: {lively: [{s:'......C.....',w:1}],
               rowdy: [{s:'C.....C.....',w:1},{s:'......C..c..',w:1}]}},
