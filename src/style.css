@@ -569,3 +569,31 @@ h2 .keepBtn{margin-left:auto;}
 .fgTileIc{font-size:20px;}
 .fgTileNm{font-size:11px; font-weight:700; text-align:center; line-height:1.1;}
 .fgGhost{border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.5);}
+
+/* ---- Forge: starter progressions, direct bar editor, busy buttons ---- */
+.fgProgs{display:flex; flex-wrap:wrap; gap:6px;}
+.fgProg{
+  display:flex; flex-direction:column; align-items:flex-start; gap:1px; font-family:inherit; cursor:pointer;
+  padding:6px 11px; border-radius:8px; color:#3a2200;
+  background:radial-gradient(circle at 50% 15%, #f2e5c0, #d8c088); border:1.5px solid #9a7a44;
+}
+.fgProgN{font-size:12px; font-weight:700;}
+.fgProgC{font-size:10.5px; color:var(--ink-soft); letter-spacing:.02em;}
+.fgEditor{margin-bottom:8px;}
+.fgEditor .fgPalHint{font-size:12px; color:var(--ink-soft); font-style:italic;}
+.fgEditor.open{background:linear-gradient(180deg,#f4e7c2,#e6d3a4); border:1.5px solid #9a7a44; border-radius:10px; padding:10px;}
+.fgEdHdr{display:flex; align-items:center; margin-bottom:8px;}
+.fgEdTitle{font-size:14px; font-weight:700; color:var(--ink); font-variant:small-caps; letter-spacing:.04em;}
+.fgEdDone{margin-left:auto; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:5px 14px; border-radius:7px;
+  color:#3a2200; background:radial-gradient(circle at 50% 25%, var(--brass-lite), var(--brass) 65%); border:1.5px solid var(--brass-dark);}
+.fgEdChords{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+.fgEdChords .fgChord{min-width:48px; height:44px; font-size:15px;}
+.fgChord.cur{box-shadow:0 0 0 2px var(--brass-dark); background:radial-gradient(circle at 50% 20%, var(--brass-lite), var(--brass) 70%);}
+.fgEdRemove{font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; padding:7px 14px; border-radius:8px;
+  color:#efe3c0; background:linear-gradient(180deg,#7a3a2a,#5a2a1e); border:1.5px solid #3a1a10;}
+.fgEdRemove:disabled{opacity:.4;}
+.fgCell.fgCellAdd .fgCellN{color:#b8946a;}
+.fgBusy{display:flex; gap:4px; margin-left:auto;}
+.fgBusyOpt{font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; padding:5px 10px; border-radius:6px;
+  color:#efe3c0; background:linear-gradient(180deg,#4a3620,#38260f); border:1px solid #2e1f0e;}
+.fgBusyOpt[aria-pressed="true"]{color:#3a2200; background:radial-gradient(circle at 50% 30%, var(--brass-lite), var(--brass) 70%); border-color:var(--brass-dark);}

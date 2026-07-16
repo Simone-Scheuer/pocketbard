@@ -11,6 +11,20 @@ import * as engine from './engine.js';
 const METERS = [['2/4', 2, 4], ['3/4', 3, 4], ['4/4', 4, 4], ['6/8', 2, 6], ['9/8', 3, 6]];
 const MODE_LIST = [['dorian', 'Dorian'], ['major', 'Major'], ['mixolydian', 'Mixolydian'],
   ['aeolian', 'Minor'], ['phrygian', 'Phrygian'], ['hijaz', 'Hijaz']];
+const Maj = (d) => ({d, q: 'M'}), Min = (d) => ({d, q: 'm'});
+/* named starter progressions per mode (real trad shapes), one tap fills a part */
+const PROGRESSIONS = {
+  dorian: [['Wander', [Min(0), Maj(3), Maj(6), Min(0)]], ['Vamp', [Min(0), Maj(6), Min(0), Maj(6)]],
+    ['Lift', [Min(0), Maj(2), Maj(3), Min(0)]], ['Rock', [Min(0), Maj(3), Min(0), Maj(3)]]],
+  major: [['Trad', [Maj(0), Maj(3), Maj(4), Maj(0)]], ['Walk down', [Maj(0), Maj(4), Min(5), Maj(3)]],
+    ['Courtly', [Maj(0), Maj(3), Maj(0), Maj(4)]], ['Homely', [Maj(0), Min(5), Maj(3), Maj(4)]]],
+  mixolydian: [['Session', [Maj(0), Maj(6), Maj(3), Maj(0)]], ['Vamp', [Maj(0), Maj(6), Maj(0), Maj(6)]],
+    ['Reel', [Maj(0), Maj(3), Maj(6), Maj(0)]]],
+  aeolian: [['Lament', [Min(0), Maj(5), Maj(6), Min(0)]], ['Falling', [Min(0), Maj(6), Maj(5), Maj(6)]],
+    ['Folk', [Min(0), Maj(2), Maj(6), Min(0)]]],
+  phrygian: [['Dark', [Min(0), Maj(1), Min(0), Maj(1)]], ['Spanish', [Min(0), Maj(1), Maj(2), Maj(1)]]],
+  hijaz: [['Desert', [Min(0), Maj(1), Min(0), Maj(1)]], ['Caravan', [Min(0), Maj(1), Maj(3), Min(0)]]],
+};
 
 /* ---- pattern synthesis from a busyness 1..3 ---- */
 function mkDrum(m, d) { const B = m.beatsPerBar, S = m.stepsPerBeat, a = Array(B * S).fill('.'); a[0] = 'D';
@@ -130,7 +144,7 @@ export function initForge() {
   $('#fgPreview').addEventListener('click', preview);
   engine.on('forge-now', showNow);
   commit();
-  buildPartTabs(); buildRuler(); buildPalette(); buildOrder(); buildTracks(); buildShelf();
+  buildPartTabs(); buildProgs(); buildRuler(); buildEditor(); buildOrder(); buildTracks(); buildShelf();
   updateFoundNow();
 }
 
@@ -150,12 +164,12 @@ function updateFoundNow() {
 function buildFoundation() {
   seg('#fgMeter', METERS.map(m => [m[0], m[0]]), () => draft.beatsPerBar + '/' + (draft.stepsPerBeat === 6 ? 8 : 4),
     v => { const m = METERS.find(x => x[0] === v); draft.beatsPerBar = m[1]; draft.stepsPerBeat = m[2]; draft.lilt = m[2] === 6 ? .06 : 0; draft.swing = 0; commit(); updateFoundNow(); });
-  seg('#fgMode', MODE_LIST, () => draft.mode, v => { draft.mode = v; commit(); buildPalette(); buildRuler(); updateFoundNow(); });
+  seg('#fgMode', MODE_LIST, () => draft.mode, v => { draft.mode = v; commit(); buildProgs(); buildEditor(); buildRuler(); updateFoundNow(); });
   const keyWrap = $('#fgKey'); keyWrap.textContent = '';
   NOTE_NAMES.forEach((n, pc) => {
     const b = document.createElement('button'); b.className = 'fgKeyBtn'; b.textContent = n;
     b.setAttribute('aria-pressed', String(pc === draft.tonic));
-    b.addEventListener('click', () => { draft.tonic = pc; for (const o of keyWrap.children) o.setAttribute('aria-pressed', String(o === b)); commit(); buildPalette(); buildRuler(); updateFoundNow(); });
+    b.addEventListener('click', () => { draft.tonic = pc; for (const o of keyWrap.children) o.setAttribute('aria-pressed', String(o === b)); commit(); buildProgs(); buildEditor(); buildRuler(); updateFoundNow(); });
     keyWrap.appendChild(b);
   });
   $('#fgTempo').addEventListener('input', e => { draft.bpm = +e.target.value; $('#fgTempoOut').textContent = e.target.value; updateFoundNow(); });
@@ -170,7 +184,7 @@ function buildPartTabs() {
   for (const name of Object.keys(draft.sections)) {
     const b = document.createElement('button'); b.className = 'fgSecTab'; b.textContent = name; b.dataset.part = name;
     b.setAttribute('aria-pressed', String(name === activeSec));
-    b.addEventListener('click', () => { activeSec = name; selChord = -1; buildPartTabs(); buildRuler(); });
+    b.addEventListener('click', () => { activeSec = name; selChord = -1; buildPartTabs(); buildRuler(); buildEditor(); });
     wrap.appendChild(b);
   }
   if (Object.keys(draft.sections).length < 4) {
@@ -183,37 +197,60 @@ function buildPartTabs() {
     wrap.appendChild(add);
   }
 }
+function buildProgs() {
+  const wrap = $('#fgProgs'); if (!wrap) return; wrap.textContent = '';
+  for (const [name, chords] of PROGRESSIONS[draft.mode] || []) {
+    const b = document.createElement('button'); b.className = 'fgProg';
+    b.innerHTML = '<span class="fgProgN">' + name + '</span><span class="fgProgC">' + chords.map(c => chordName(c.d, c.q)).join(' ') + '</span>';
+    b.title = 'fill this part with ' + name;
+    b.addEventListener('click', () => {
+      draft.sections[activeSec] = chords.map(c => ({...c}));
+      selChord = -1; commit(); buildRuler(); buildEditor();
+    });
+    wrap.appendChild(b);
+  }
+}
 function buildRuler() {
   const wrap = $('#fgRuler'); if (!wrap) return; wrap.textContent = '';
   const bars = draft.sections[activeSec] || [];
   bars.forEach((spec, i) => {
     const cell = document.createElement('button'); cell.className = 'fgCell' + (i === selChord ? ' sel' : ''); cell.dataset.i = i;
-    cell.innerHTML = '<span class="fgCellN">' + (i + 1) + '</span><span class="fgCellC">' + chordName(spec.d, spec.q) + '</span>' +
-      (i === selChord ? '<span class="fgCellX" role="button" aria-label="remove bar">✕</span>' : '');
-    cell.addEventListener('click', e => {
-      if (e.target.classList.contains('fgCellX')) { removeChord(i); return; }
-      selChord = (selChord === i) ? -1 : i; buildRuler(); buildPalette();
-    });
+    cell.innerHTML = '<span class="fgCellN">' + (i + 1) + '</span><span class="fgCellC">' + chordName(spec.d, spec.q) + '</span>';
+    cell.addEventListener('click', () => { selChord = (selChord === i) ? -1 : i; buildRuler(); buildEditor(); });
     wrap.appendChild(cell);
   });
-  const add = document.createElement('button'); add.className = 'fgCell fgCellAdd'; add.textContent = '+'; add.title = 'add a bar';
-  add.addEventListener('click', () => { if (bars.length < 16) { bars.push({...(bars[bars.length - 1] || {d: 0, q: 'm'})}); selChord = bars.length - 1; commit(); buildRuler(); buildPalette(); } });
+  const add = document.createElement('button'); add.className = 'fgCell fgCellAdd'; add.title = 'add a bar';
+  add.innerHTML = '<span class="fgCellN">add</span><span class="fgCellC">+</span>';
+  add.addEventListener('click', () => { if (bars.length < 16) { bars.push({...(bars[bars.length - 1] || {d: 0, q: 'm'})}); selChord = bars.length - 1; commit(); buildRuler(); buildEditor(); } });
   wrap.appendChild(add);
 }
-function removeChord(i) { const bars = draft.sections[activeSec]; if (bars.length <= 1) return; bars.splice(i, 1); selChord = -1; commit(); buildRuler(); buildPalette(); }
-function buildPalette() {
-  const wrap = $('#fgPalette'); if (!wrap) return; wrap.textContent = '';
-  const hint = document.createElement('span'); hint.className = 'fgPalHint';
-  hint.textContent = selChord >= 0 ? 'set bar ' + (selChord + 1) + ':' : 'tap a bar, then a chord →';
-  wrap.appendChild(hint);
+/* the direct bar editor — tap a bar above, its chords appear here to set,
+   with a plain "remove bar" button (no corner tapping) */
+function buildEditor() {
+  const wrap = $('#fgEditor'); if (!wrap) return; wrap.textContent = '';
+  if (selChord < 0) { wrap.classList.remove('open'); wrap.innerHTML = '<span class="fgPalHint">tap a bar above to change its chord</span>'; return; }
+  wrap.classList.add('open');
+  const spec = draft.sections[activeSec][selChord];
+  const hdr = document.createElement('div'); hdr.className = 'fgEdHdr';
+  hdr.innerHTML = '<span class="fgEdTitle">Bar ' + (selChord + 1) + ' · ' + chordName(spec.d, spec.q) + '</span>';
+  const done = document.createElement('button'); done.className = 'fgEdDone'; done.textContent = 'done';
+  done.addEventListener('click', () => { selChord = -1; buildRuler(); buildEditor(); });
+  hdr.appendChild(done); wrap.appendChild(hdr);
+  const row = document.createElement('div'); row.className = 'fgEdChords';
   for (const c of palette()) {
-    const b = document.createElement('button'); b.className = 'fgChord'; b.textContent = chordName(c.d, c.q);
-    b.addEventListener('click', () => { if (selChord < 0) return; draft.sections[activeSec][selChord] = {d: c.d, q: c.q}; commit(); buildRuler(); });
-    wrap.appendChild(b);
+    const b = document.createElement('button'); b.className = 'fgChord' + (c.d === spec.d && spec.q !== '5' ? ' cur' : ''); b.textContent = chordName(c.d, c.q);
+    b.addEventListener('click', () => { draft.sections[activeSec][selChord] = {d: c.d, q: c.q}; commit(); buildRuler(); buildEditor(); });
+    row.appendChild(b);
   }
-  const fifth = document.createElement('button'); fifth.className = 'fgChord fgFifth'; fifth.textContent = 'open 5th';
-  fifth.addEventListener('click', () => { const b = draft.sections[activeSec][selChord]; if (b) { b.q = '5'; commit(); buildRuler(); } });
-  wrap.appendChild(fifth);
+  const fifth = document.createElement('button'); fifth.className = 'fgChord fgFifth' + (spec.q === '5' ? ' cur' : ''); fifth.textContent = 'open 5th';
+  fifth.addEventListener('click', () => { spec.q = '5'; commit(); buildRuler(); buildEditor(); });
+  row.appendChild(fifth);
+  wrap.appendChild(row);
+  const bars = draft.sections[activeSec];
+  const rm = document.createElement('button'); rm.className = 'fgEdRemove'; rm.textContent = '🗑 remove bar';
+  rm.disabled = bars.length <= 1;
+  rm.addEventListener('click', () => { if (bars.length > 1) { bars.splice(selChord, 1); selChord = -1; commit(); buildRuler(); buildEditor(); } });
+  wrap.appendChild(rm);
 }
 
 /* ---- order ---- */
@@ -261,10 +298,13 @@ function buildTracks() {
     }
     if (role.dens) {
       const dw = document.createElement('div'); dw.className = 'fgBusy';
-      dw.innerHTML = '<span class="fgBusyLbl">busy</span>';
-      const rng = document.createElement('input'); rng.type = 'range'; rng.min = 1; rng.max = 3; rng.step = 1; rng.value = r.dens; rng.className = 'fgBusyRng';
-      rng.addEventListener('input', e => { r.dens = +e.target.value; commit(); });
-      dw.appendChild(rng); body.appendChild(dw);
+      ['Sparse', 'Medium', 'Busy'].forEach((lab, i) => {
+        const b = document.createElement('button'); b.className = 'fgBusyOpt'; b.textContent = lab;
+        b.setAttribute('aria-pressed', String(r.dens === i + 1));
+        b.addEventListener('click', () => { r.dens = i + 1; for (const o of dw.children) o.setAttribute('aria-pressed', String(o === b)); commit(); });
+        dw.appendChild(b);
+      });
+      body.appendChild(dw);
     }
     lane.appendChild(body);
     const del = document.createElement('button'); del.className = 'fgLaneDel'; del.textContent = '✕'; del.setAttribute('aria-label', 'remove track');
@@ -321,7 +361,7 @@ function saveSong() {
   document.dispatchEvent(new CustomEvent('forge-saved', {detail: {id}}));
   const b = $('#fgSave'); b.textContent = 'Saved ✓'; setTimeout(() => { b.textContent = 'Save to set list'; }, 1600);
 }
-export function forgeOnShow() { commit(); $('#fgName').value = draft.name; buildRuler(); }
+export function forgeOnShow() { commit(); $('#fgName').value = draft.name; buildProgs(); buildRuler(); buildEditor(); }
 export function forgeTransport(playing) {
   const b = $('#fgPreview'); if (b) b.textContent = playing && state.styleId === '__draft' ? '◼ Stop' : '▶ Preview';
   if (!playing) clearNow();

@@ -11,6 +11,12 @@
   extended double-tonic) so they loop less obviously · "make loops longer, add
   a variation on the progression then a variation on that"
 
+- 2026-07-15 · P · FORGE chord/track flow fixes: (1) STARTER PROGRESSIONS row
+  (named trad shapes per mode, one tap fills a part, shows the chords).
+  (2) DIRECT bar editor — tap a bar, a panel shows the in-key chords + a plain
+  '🗑 remove bar' button (killed the corner-✕ tap). (3) busyness = plain
+  Sparse/Medium/Busy buttons (killed the odd slider) · "editing chords is
+  tap-then-corner-tap, busy slider feels odd, want default progressions"
 - 2026-07-15 · P · FORGE = DAW ARRANGEMENT VIEW (base-principles redesign):
   the composition surface is now a timeline (chord cells in parts, tap to edit)
   + instrument TRACK LANES stacked below, not a settings form. Instruments are
