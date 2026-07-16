@@ -11,6 +11,14 @@
   extended double-tonic) so they loop less obviously · "make loops longer, add
   a variation on the progression then a variation on that"
 
+- 2026-07-15 · V · REVERTED generated melody lines. Walking Set (Rambler's
+  Road / Sunny Mile / Quiet Hollow): plucked parts back to flowing arpeggiated
+  HARMONY (dropped the `melody` generator + `fiddleLine` counter-voice), fiddle
+  removed, faster tempos kept (116/120/100) so they don't drag. Tavern Jig:
+  fiddle bowedLine removed (the hush DOUBLE-STOPS). Festival Jig untouched —
+  Simone says it still sounds good, so it keeps its fiddle · "double stops
+  infected tavern jig, complicated melodies made the walking tunes not great —
+  revert those; festival still good"
 - 2026-07-15 · P · FORGE chord/track flow fixes: (1) STARTER PROGRESSIONS row
   (named trad shapes per mode, one tap fills a part, shows the chords).
   (2) DIRECT bar editor — tap a bar, a panel shows the in-key chords + a plain

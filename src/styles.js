@@ -11,13 +11,13 @@ export const DRUM_MAPS = {
 
 export const STYLES = {
   /* ---- The Walking Set: simple, spacious, drone-anchored tunes built to
-     play over forever. Three voices (plucked + bowed fiddle + soft bodhrán)
-     over a tonic drone, with a real 4-chord journey in each section. ---- */
+     play over forever. Plucked arpeggios + soft bodhrán over a tonic drone —
+     no generated melody line, no fiddle, so the whistle owns the tune. ---- */
   ramblers_road: {
     /* D Dorian. A: i-IV-bVII-i (research's #1 "walk forever" loop). B:
        i-bIII-IV-i, the hidden gem — two major chords rising by step out of
-       the minor tonic. Harp plays a flowing modal MELODY, fiddle a slow
-       counter-voice, over a D drone. */
+       the minor tonic. Harp arpeggiates the chords over a D drone; the
+       whistle carries the melody. */
     name: 'Rambler’s Road', icon: '🥾', mode: 'dorian', tonic: 2, bpm: 116,
     beatsPerBar: 2, stepsPerBeat: 6, swing: 0, lilt: .06, reverb: .18, drone: .42, pad: 0,
     sections: {A: [{d:0,q:'m'},{d:3,q:'M'},{d:6,q:'M'},{d:0,q:'m'}],
@@ -29,8 +29,11 @@ export const STYLES = {
               lively: [{s:'D.....D..t..',w:2},{s:'D.t...D.....',w:1},{s:'D.....d..t..',w:1}],
               rowdy: [{s:'D.t...D..t..',w:2},{s:'D.t.t.D.....',w:1}]},
         fills: ['D.....d.t.t.']},
-      pluck: {kind:'gen', inst:'harp', gen:'melody'},
-      bowed: {kind:'gen', inst:'fiddle', gen:'fiddleLine'},
+      pluck: {kind:'harmony', inst:'harp',
+        pat: {calm: [{s:'0...2...4...',w:2},{s:'0.......2...',w:1}],
+              lively: [{s:'0..1..2..4..',w:2},{s:'0.2.4.2.1.0.',w:2},{s:'0...2.4.2...',w:1}],
+              rowdy: [{s:'0.1.2.4.2.1.',w:2},{s:'0.2.4.3.4.2.',w:1}]},
+        fills: ['0.1.2.4.5.4.']},
       bass: {kind:'bass', inst:'bassViol',
         pat: {calm: [{s:'R...........',w:1}],
               lively: [{s:'R.....5.....',w:2},{s:'R...........',w:1}],
@@ -38,8 +41,8 @@ export const STYLES = {
     }},
   sunny_mile: {
     /* G Major. A: I-IV-V-I (folk backbone). B: vi-V-IV-I, a descending walk
-       home ("superb to solo over"). Lute plays the melody, fiddle sings
-       under. Faster and crisper — room for a flute on top. */
+       home ("superb to solo over"). Lute strums and gently arpeggiates —
+       faster and crisper, room for a flute on top. */
     name: 'Sunny Mile', icon: '☀️', mode: 'major', tonic: 7, bpm: 120,
     beatsPerBar: 4, stepsPerBeat: 4, swing: .04, reverb: .18, drone: .3, pad: 0,
     sections: {A: [{d:0,q:'M'},{d:3,q:'M'},{d:4,q:'M'},{d:0,q:'M'}],
@@ -51,8 +54,11 @@ export const STYLES = {
               lively: [{s:'D.......D...t...',w:2},{s:'D...t...D.......',w:1}],
               rowdy: [{s:'D...t...D...t...',w:2},{s:'D...t...D.t.t...',w:1}]},
         fills: ['D.......D...t.t.']},
-      pluck: {kind:'gen', inst:'lute', gen:'melody'},
-      bowed: {kind:'gen', inst:'fiddle', gen:'fiddleLine'},
+      pluck: {kind:'harmony', inst:'lute',
+        pat: {calm: [{s:'C.......C.......',w:2},{s:'C...............',w:1}],
+              lively: [{s:'C...c...C...c...',w:2},{s:'C.......C...c...',w:1},{s:'C...c.u.C...c...',w:1}],
+              rowdy: [{s:'C...c.u.C...c.u.',w:2},{s:'C.1.2.3.C...c...',w:1}]},
+        fills: ['C...c...1.2.3.4.']},
       bass: {kind:'bass', inst:'bassViol',
         pat: {calm: [{s:'R...............',w:1}],
               lively: [{s:'R.......5.......',w:2},{s:'R.......5.....P.',w:1}],
@@ -60,8 +66,8 @@ export const STYLES = {
     }},
   quiet_hollow: {
     /* E Dorian. A: i-IV-i-IV, the naked raised-6th vamp (purest, hypnotic
-       Dorian). B: i-bIII-IV-i hidden gem. Slow and spacious but with a real
-       melodic line and fiddle counter-voice now. */
+       Dorian). B: i-bIII-IV-i hidden gem. Slow and spacious — harp
+       arpeggios over a big drone, leaving all the air for the whistle. */
     name: 'Quiet Hollow', icon: '🌙', mode: 'dorian', tonic: 4, bpm: 100,
     beatsPerBar: 4, stepsPerBeat: 4, swing: 0, reverb: .3, drone: .5, pad: .05,
     sections: {A: [{d:0,q:'m'},{d:3,q:'M'},{d:0,q:'m'},{d:3,q:'M'}],
@@ -73,8 +79,11 @@ export const STYLES = {
               lively: [{s:'D.......d.......',w:2},{s:'D...............',w:1}],
               rowdy: [{s:'D.......D.......',w:1},{s:'D...t...d.......',w:1}]},
         fills: ['D.......d...t...']},
-      pluck: {kind:'gen', inst:'harp', gen:'melody'},
-      bowed: {kind:'gen', inst:'fiddle', gen:'fiddleLine'},
+      pluck: {kind:'harmony', inst:'harp',
+        pat: {calm: [{s:'0.......4.......',w:2},{s:'0...............',w:1}],
+              lively: [{s:'0...2...4...2...',w:2},{s:'0.......4...2...',w:1}],
+              rowdy: [{s:'0.1.2.3.4...2...',w:1},{s:'0...2...4.3.2...',w:1}]},
+        fills: ['4...3...2...0...']},
       bass: {kind:'bass', inst:'bassViol',
         pat: {calm: [{s:'R...............',w:1}],
               lively: [{s:'R.......5.......',w:1}],
@@ -94,7 +103,6 @@ export const STYLES = {
         fills: ['D...t.dtdtdt','D.t.t.D.dtdt','D.ttt.D.t.tt']},
       texture: {kind:'gen', inst:'bongos', gen:'fingerTexture', density:.55},
       tss: {kind:'gen', inst:'silver', gen:'backbeatTss'},
-      bowed: {kind:'gen', inst:'fiddle', gen:'bowedLine', octave:12},
       jingle: {kind:'jingle', inst:'tambourine', pat:{lively:[{s:'x.....X.....',w:1}], rowdy:[{s:'X.....X.....',w:2},{s:'X..x..X..x..',w:1}]}},
       pluck: {kind:'harmony', inst:'lute',
         pat: {calm: [{s:'C...........',w:2},{s:'0.1.2.3.2.1.',w:1}],
