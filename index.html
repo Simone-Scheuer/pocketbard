@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#241708">
+  <meta name="description" content="Fantasy tavern backing tracks for wandering minstrels">
+  <title>PocketBard</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script type="module" crossorigin src="./assets/index-D4qmZNsq.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-zqM82uDo.css">
+</head>
+<body>
+
+<div id="glow" aria-hidden="true"></div>
+<div id="board">
+  <header>
+    <div class="sign">
+      <h1>Pocket Bard</h1>
+      <p class="tag">backing tracks for wandering minstrels</p>
+    </div>
+  </header>
+
+  <div id="viewPlay" class="view active">
+    <section id="nowWindow" aria-label="Now playing">
+      <div id="nowSub">tap play to strike up the band</div>
+      <div id="nowGlance">
+        <div id="chordNow">—</div>
+        <span id="nowArrow" aria-hidden="true">→</span>
+        <div id="nextWrap"><span class="lbl">next</span><div id="chordNext">—</div></div>
+      </div>
+      <div id="pulseRow" hidden aria-hidden="true"></div>
+      <div class="modeline"><b class="modeNameEl">D Dorian</b> · <span class="whistleHintEl"></span></div>
+    </section>
+
+    <section>
+      <div class="voiceRow"><span class="vlabel">My key</span><div class="vopts" id="voxMyKey" role="group" aria-label="Your instrument's key"></div></div>
+      <p class="wsNote" id="autoKeyNote">Each tune plays in its own key.</p>
+    </section>
+
+    <section>
+      <h2>Set List</h2>
+      <div id="cards" role="group" aria-label="Choose a tune"></div>
+    </section>
+
+    <section>
+      <h2>The Band</h2>
+      <div id="chips" role="group" aria-label="Turn instruments on and off"></div>
+    </section>
+
+    <section>
+      <h2>Energy</h2>
+      <div id="revelry" role="group" aria-label="Energy">
+        <button data-e="0">🕯️ Calm</button>
+        <button data-e="1" aria-pressed="true">🍻 Lively</button>
+        <button data-e="2">🔥 Rowdy</button>
+      </div>
+      <div class="voiceRow" style="margin-top:12px">
+        <span class="vlabel">Tempo</span>
+        <div class="sliderRow" style="flex:1;margin:0">
+          <input id="tempo" type="range" min="52" max="180" step="1" value="108" aria-label="Tempo">
+          <output id="bpmOut">108</output>
+        </div>
+      </div>
+    </section>
+
+    <div id="homeFooter">
+      <button id="toGroove" class="ghostBtn">🥁 Drum circle</button>
+      <button id="toAdvanced" class="ghostBtn">⚙ Advanced</button>
+      <button id="toForge" class="ghostBtn">⚒ Forge a tune</button>
+    </div>
+  </div>
+
+  <div id="viewSetup" class="view">
+    <button class="ghostBtn backHome">‹ Done</button>
+
+    <section id="secTuneKey">
+      <h2>Tune Key</h2>
+      <div id="keys" role="group" aria-label="Choose the tune's key"></div>
+      <div class="modeline"><span><b class="modeNameEl">D Dorian</b> · <span class="whistleHintEl"></span></span><span class="sp"></span><button id="trDown" class="trBtn" aria-label="Transpose down a semitone">♭</button><button id="trUp" class="trBtn" aria-label="Transpose up a semitone">♯</button><button id="blendBtn" class="trBtn blendBtn" aria-pressed="false">Blend</button></div>
+      <p class="wsNote">“My key” usually handles this — pin a tune to an exact key here. <b>Blend</b> eases slowly into key &amp; tune changes.</p>
+    </section>
+
+    <section>
+      <h2>Voices</h2>
+      <div class="voiceRow"><span class="vlabel">Strings</span><div class="vopts" id="voxStrings" role="group" aria-label="Strings voice"></div></div>
+      <div class="voiceRow"><span class="vlabel">Drum</span><div class="vopts" id="voxDrums" role="group" aria-label="Drum voice"></div></div>
+      <div id="ambience" role="group" aria-label="Ambience" style="margin-top:12px"></div>
+      <p class="wsNote">The band itself lives on the front page. Hearth = a crackling fireside under everything.</p>
+    </section>
+
+    <section>
+      <h2>Keep this sound</h2>
+      <p class="wsNote">Save the current tune, key, tempo, band and mix as your own card in the Set List.</p>
+      <div class="wsBtns"><button id="keepBtn" class="ghostBtn">+ Keep this sound</button></div>
+    </section>
+
+    <section>
+      <details id="fieldNotes">
+        <summary>Field Notes <span class="dis" id="fnCount"></span></summary>
+        <p class="wsNote">Moments you marked with the 🪶 while playing — each remembers the tune, key, energy and full mix. Add words, then copy the lot for Claude.</p>
+        <div id="fnList"></div>
+        <div class="wsBtns">
+          <button id="fnCopy" class="ghostBtn">Copy all</button>
+          <button id="fnClear" class="ghostBtn">Clear all</button>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details id="workshop">
+        <summary>The Workshop <span class="dis">tap to open</span></summary>
+        <p class="wsNote">Shape the band to taste. Changes are saved on this device.</p>
+        <div id="wsRows"></div>
+        <div class="wsBtns"><button id="wsReset" class="ghostBtn">Reset to house blend</button></div>
+        <details id="wsShare">
+          <summary>Share or restore settings</summary>
+          <textarea id="wsJson" rows="3" spellcheck="false" aria-label="Settings as JSON"></textarea>
+          <div class="wsBtns">
+            <button id="wsCopy" class="ghostBtn">Copy</button>
+            <button id="wsApply" class="ghostBtn">Apply</button>
+          </div>
+        </details>
+      </details>
+    </section>
+
+    <p class="tip">No sound? Flip your phone off silent. The screen stays awake while the band plays.</p>
+  </div>
+
+  <div id="viewForge" class="view">
+    <div class="fgHead">
+      <button class="ghostBtn backHome">‹ Back to the stage</button>
+      <input id="fgName" type="text" maxlength="28" value="My Tune" aria-label="Tune name">
+      <button id="fgPreview" class="fgHeadBtn">▶ Preview</button>
+    </div>
+
+    <details id="fgFound">
+      <summary>Key, meter &amp; feel <span class="dis" id="fgFoundNow"></span></summary>
+      <div class="fgField"><span class="fgLbl">Meter</span><div class="fgSeg" id="fgMeter"></div></div>
+      <div class="fgField"><span class="fgLbl">Mode</span><div class="fgSeg" id="fgMode"></div></div>
+      <div class="fgField"><span class="fgLbl">Key</span><div class="fgSeg" id="fgKey"></div></div>
+      <div class="sliderRow"><span class="fgLbl">Pace</span><input id="fgTempo" type="range" min="60" max="168" step="1" value="104"><output id="fgTempoOut">104</output></div>
+      <div class="sliderRow"><span class="fgLbl">Drone</span><input id="fgDrone" type="range" min="0" max="70" step="1" value="40"></div>
+    </details>
+
+    <h2>Timeline</h2>
+    <div class="fgField"><span class="fgLbl">Start</span><div id="fgProgs" class="fgProgs" role="group" aria-label="Starter progressions"></div></div>
+    <div class="fgTimeline">
+      <div id="fgParts" class="fgParts" role="group" aria-label="Parts"></div>
+      <div id="fgRuler" class="fgRuler" role="group" aria-label="Chords in the current part"></div>
+    </div>
+    <div id="fgEditor" class="fgEditor" role="group" aria-label="Chord editor"></div>
+    <div class="fgField" style="margin-top:6px"><span class="fgLbl">Order</span><div id="fgOrder" class="fgOrder" role="group" aria-label="Play order"></div></div>
+
+    <h2>Tracks</h2>
+    <div id="fgTracks" class="fgTracks" data-drop="tracks"></div>
+
+    <p class="wsNote">Drag an instrument up into your tracks to add it. Drag it back down to remove it.</p>
+    <div id="fgShelf" class="fgShelf"></div>
+
+    <div class="wsBtns" style="margin-top:14px"><button id="fgSave" class="ghostBtn">Save to set list</button></div>
+  </div>
+
+  <div id="viewGroove" class="view">
+    <button class="ghostBtn backHome">‹ Done</button>
+    <div class="grTop">
+      <h2>Drum Circle</h2>
+      <button id="grPlay" class="fgHeadBtn">▶ Play</button>
+    </div>
+    <p class="wsNote">Stack percussion into a steady loop — no key, no chords. Set a groove, then play any tune over it.</p>
+    <div class="grBar">
+      <span class="fgLbl">Meter</span><div id="grMeter" class="fgSeg"></div>
+    </div>
+    <div class="sliderRow"><span class="fgLbl">Tempo</span><input id="grTempo" type="range" min="60" max="168" step="1" value="120"><output id="grTempoOut">120</output></div>
+    <h3 class="grH">Quick grooves</h3>
+    <div id="grPresets" class="grPresets" role="group" aria-label="Starter grooves"></div>
+    <h3 class="grH">Layers</h3>
+    <div id="grVoices" class="grVoices"></div>
+  </div>
+</div>
+
+<div id="shelf">
+  <div id="shelfInner">
+    <button id="playBtn" aria-label="Play"><span id="ring"></span>
+      <svg id="glyphPlay" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.8L19 12 8.6 18.2z" fill="currentColor"/></svg>
+      <svg id="glyphStop" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" fill="currentColor"/></svg>
+    </button>
+    <div id="lantern" aria-hidden="true">
+      <svg id="flameSvg" viewBox="0 0 24 32">
+        <defs>
+          <linearGradient id="fg" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#f7b733"/><stop offset=".55" stop-color="#f78f33"/><stop offset="1" stop-color="#f2d78a"/>
+          </linearGradient>
+        </defs>
+        <path id="flame" fill="url(#fg)" d="M12 31 C5.5 27 4.5 20.5 8 15.5 C10 12.5 11.2 9 12 3.5 C12.8 9 14 12 16 15.5 C19.5 20.5 18.5 27 12 31 Z"/>
+      </svg>
+    </div>
+    <div id="shelfSpacer" aria-hidden="true"></div>
+    <button id="noteBtn" aria-label="Mark this moment as a field note" title="Something catch your ear? Mark the moment — review it later in Advanced → Field Notes">🪶</button>
+    <div id="volWrap">
+      <label for="vol">Volume</label>
+      <input id="vol" type="range" min="0" max="1" step="0.01" value="0.8">
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
